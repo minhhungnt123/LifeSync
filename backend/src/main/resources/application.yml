@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: lifesync-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lifesync_db
+    username: postgres
+    password: postgrespassword
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250655368566D5971
+  expiration-ms: 86400000

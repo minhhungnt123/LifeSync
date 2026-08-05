@@ -1,0 +1,157 @@
+# LifeSync AI - Roadmap & Task Breakdown (MVP Milestone)
+
+> Tài liệu này được tổng hợp và phân chi tiết từ file [PROJECT_CONTEXT.md](file:///d:/PersonalProject/PROJECT_CONTEXT.md). Danh sách các Milestone và Task nhằm định hướng phát triển phiên bản MVP (Minimum Viable Product) theo đúng tiêu chuẩn Clean Architecture và nguyên lý SOLID.
+
+---
+
+## 🗺️ Tổng quan Lộ trình phát triển (Milestone Overview)
+
+| Milestone | Tên Milestone | Mục tiêu chính | Thời lượng ước tính | Trạng thái |
+| :--- | :--- | :--- | :--- | :--- |
+| **M1** | Project Setup & Architecture Foundation | Khởi tạo cấu trúc dự án Full-stack, thiết lập DB, hệ thống Base Entity & UI Design System | 1 Tuần | ✅ Hoàn thành |
+| **M2** | Authentication & User Management | Xây dựng cơ chế xác thực JWT, Đăng ký / Đăng nhập, bảo mật API và Quản lý User Profile | 1 Tuần | ✅ Hoàn thành |
+| **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | 1.5 Tuần | 🔄 Đang triển khai |
+| **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | 1 Tuần | ⏳ Chờ thực hiện |
+| **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | 1 Tuần | ⏳ Chờ thực hiện |
+| **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | 1.5 Tuần | ⏳ Chờ thực hiện |
+| **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | 1 Tuần | ⏳ Chờ thực hiện |
+
+---
+
+## 📌 Phân chia Chi tiết các Task (Detailed Task Breakdown)
+
+### 🚀 Milestone 1: Project Setup & Architecture Foundation (✅ HOÀN THÀNH)
+
+> **Mục tiêu**: Xây dựng bộ khung ứng dụng (Scaffold), cấu hình môi trường phát triển và áp dụng Clean Architecture.
+
+#### Backend (Spring Boot 3 + Java 21)
+- [x] `TASK-101`: Khởi tạo project Spring Boot 3 với Java 21 & Maven (Dependencies: Web, JPA, Security, PostgreSQL, Validation, Lombok).
+- [x] `TASK-102`: Cấu hình PostgreSQL Database connection (`application.yml` + `docker-compose.yml`).
+- [x] `TASK-103`: Thiết lập Kiến trúc mô hình hoá (Repository - Service - Controller pattern, DTO separation).
+- [x] `TASK-104`: Tạo Base Entity (`BaseAuditableEntity` chứa `id`, `createdAt`, `updatedAt`) và định dạng Chuẩn Response Wrapper (`ApiResponse<T>`).
+- [x] `TASK-105`: Triển khai `GlobalExceptionHandler` xử lý các ngoại lệ toàn cục (`ResourceNotFoundException`, `BadRequestException`, `ValidationException`).
+
+#### Frontend (React + Vite + TypeScript)
+- [x] `TASK-106`: Khởi tạo dự án React + Vite với TypeScript.
+- [x] `TASK-107`: Cấu hình Tailwind CSS v4, Google Fonts và hệ thống Design System (Color Tokens, Glassmorphism, Micro-animations).
+- [x] `TASK-108`: Thiết lập React Router DOM v6 và định nghĩa cấu trúc Router.
+- [x] `TASK-109`: Cấu hình TanStack Query (React Query) & Axios Client.
+- [x] `TASK-110`: Dựng Base Layouts (AppLayout với Sidebar, Navbar, Main Content Area và Responsive Mobile View).
+
+---
+
+### 🔑 Milestone 2: Authentication & User Management (✅ HOÀN THÀNH)
+
+> **Mục tiêu**: Đảm bảo an toàn thông tin người dùng với xác thực Token-based (JWT).
+
+#### Backend
+- [x] `TASK-201`: Định nghĩa Entity `User` và `Role` Enum (USER, ADMIN).
+- [x] `TASK-202`: Xây dựng `JwtTokenProvider` (Tạo Token, Validate Token, Parse Claims).
+- [x] `TASK-203`: Cấu hình `SecurityFilterChain` của Spring Security (Stateless session, CORS filter, CSRF disable).
+- [x] `TASK-204`: Triển khai `AuthService` và các DTOs (`RegisterRequest`, `LoginRequest`, `AuthResponse`).
+- [x] `TASK-205`: Xây dựng `AuthController` cung cấp API `/api/v1/auth/register`, `/login`, `/refresh`, `/me`.
+- [x] `TASK-206`: Xử lý nạp UserDetails và Exception Handling cho Authentication.
+
+#### Frontend
+- [x] `TASK-207`: Xây dựng `AuthContext` / State Store quản lý thông tin User & Access Token.
+- [x] `TASK-208`: Dựng trang Đăng ký (Register Page) kèm Form validation.
+- [x] `TASK-209`: Dựng trang Đăng nhập (Login Page) với giao diện Glassmorphism hiện đại.
+- [x] `TASK-210`: Xây dựng `ProtectedRoute` ngăn chặn truy cập trái phép.
+
+---
+
+### 📅 Milestone 3: Time & Schedule Management
+
+> **Mục tiêu**: Cho phép người dùng tạo, sửa, xóa và quản lý lịch trình cá nhân trực quan.
+
+#### Backend
+- [ ] `TASK-301`: Thiết kế Entity `Schedule` (`id`, `userId`, `title`, `description`, `startTime`, `endTime`, `category`, `status`, `priority`).
+- [ ] `TASK-302`: Tạo `ScheduleRepository` hỗ trợ query lọc lịch theo khoảng thời gian (`findByUserIdAndStartTimeBetween`).
+- [ ] `TASK-303`: Viết `ScheduleService` thực hiện CRUD và validation logic (Thời gian kết thúc phải sau thời gian bắt đầu).
+- [ ] `TASK-304`: Xây dựng `ScheduleController` (`/api/v1/schedules`).
+- [ ] `TASK-305`: Viết Unit Test cho `ScheduleService` (chú trọng kiểm thử trùng lịch / trùng khoảng thời gian).
+
+#### Frontend
+- [ ] `TASK-306`: Cấu hình và nhúng `FullCalendar` (Month, Week, Day views).
+- [ ] `TASK-307`: Kết nối React Query để fetch dữ liệu sự kiện từ Backend hiển thị lên Calendar.
+- [ ] `TASK-308`: Xây dựng Modal Form thêm/sửa Sự kiện (Create/Edit Schedule Modal) với TimePicker & Category Selector.
+- [ ] `TASK-309`: Thêm tính năng Kéo-thả (Drag & Drop) hoặc Đổi kích thước (Resize) để cập nhật thời gian sự kiện trên Calendar.
+- [ ] `TASK-310`: Xây dựng bộ lọc lịch trình theo Phân loại (Category Filter: Work, Study, Health, Personal).
+
+---
+
+### 🥗 Milestone 4: Meal Management
+
+> **Mục tiêu**: Nhật ký ăn uống và tính toán dinh dưỡng tự động theo ngày.
+
+#### Backend
+- [ ] `TASK-401`: Thiết kế Entity `MealLog` (`id`, `userId`, `mealType`, `foodName`, `calories`, `protein`, `carbs`, `fat`, `loggedAt`).
+- [ ] `TASK-402`: Viết `MealService` tính tổng chỉ số dinh dưỡng (Total Calories/Macros) theo ngày.
+- [ ] `TASK-403`: Xây dựng `MealController` (`/api/v1/meals`).
+- [ ] `TASK-404`: Tạo DTOs (`MealLogRequest`, `MealLogResponse`, `DailyNutritionSummaryResponse`).
+
+#### Frontend
+- [ ] `TASK-405`: Thiết kế trang Quản lý Bữa ăn (Meal Management Dashboard).
+- [ ] `TASK-406`: Dựng danh sách thẻ bữa ăn trong ngày (Sáng, Trưa, Tối, Bữa phụ).
+- [ ] `TASK-407`: Tạo Form thêm món ăn / nhật ký dinh dưỡng.
+- [ ] `TASK-408`: Dựng thanh tiến trình (Progress Bar) tổng Calories & Macros đã tiêu thụ trong ngày so với mục tiêu.
+
+---
+
+### 📊 Milestone 5: Dashboard & Analytics
+
+> **Mục tiêu**: Tổng hợp dữ liệu thành chỉ số tổng quan và biểu đồ trực quan.
+
+#### Backend
+- [ ] `TASK-501`: Viết Custom Query trong JPA/Native SQL tổng hợp số giờ hoàn thành công việc theo tuần/tháng.
+- [ ] `TASK-502`: Viết API thống kê xu hướng nạp Calorie & dinh dưỡng theo thời gian.
+- [ ] `TASK-503`: Xây dựng `DashboardController` (`/api/v1/dashboard/summary`).
+
+#### Frontend
+- [ ] `TASK-504`: Dựng Main Dashboard View chứa các thẻ Stat Summary (Tổng giờ làm việc, Calorie nạp, Tỷ lệ hoàn thành công việc).
+- [ ] `TASK-505`: Tích hợp thư viện `Recharts` dựng Biểu đồ phân bổ thời gian (Pie Chart / Bar Chart).
+- [ ] `TASK-506`: Dựng Biểu đồ theo dõi chỉ số dinh dưỡng 7 ngày gần nhất (Area Chart / Line Chart).
+- [ ] `TASK-507`: Tối ưu hóa giao diện Dashboard thân thiện trên Responsive Layout (Desktop/Tablet/Mobile).
+
+---
+
+### 🤖 Milestone 6: AI Assistant Core Integration
+
+> **Mục tiêu**: Tích hợp Trợ lý AI trả lời dựa trên dữ liệu lịch trình và bữa ăn thực tế của người dùng.
+
+#### Backend
+- [ ] `TASK-601`: Cấu hình OpenAI Client (OpenAI Java SDK hoặc REST Template / WebClient).
+- [ ] `TASK-602`: Xây dựng `UserDataContextBuilderService`: Tổng hợp dữ liệu Schedule và MealLog gần đây của User thành Prompt Context.
+- [ ] `TASK-603`: Xây dựng Prompt System Template hướng dẫn AI (Quy định: Không tự bịa dữ liệu, phân tích năng suất & thói quen ăn uống, đưa ra gợi ý cải thiện).
+- [ ] `TASK-604`: Triển khai `AiAssistantService` và `AiController` (`/api/v1/ai/chat`) hỗ trợ nhận câu hỏi và trả về câu trả lời.
+- [ ] `TASK-605`: Thêm cơ chế giới hạn truy cập (Rate Limiting) hoặc caching cho câu hỏi phổ biến.
+
+#### Frontend
+- [ ] `TASK-606`: Xây dựng UI Chatbot Widget (Floating Chat Window & Full-page AI Chat View).
+- [ ] `TASK-607`: Xử lý giao diện hiển thị câu trả lời với Markdown Renderer & Code Highlighting.
+- [ ] `TASK-608`: Thêm bộ gợi ý câu hỏi mẫu (Prompt Chips / Quick Suggestions e.g., "Tóm tắt lịch làm việc tuần này", "Gợi ý cải thiện chế độ ăn").
+- [ ] `TASK-609`: Xử lý hiệu ứng Loading / Typing Animation khi AI đang suy nghĩ.
+
+---
+
+### 🛠️ Milestone 7: System Polish, Testing & Deployment
+
+> **Mục tiêu**: Đảm bảo chất lượng hệ thống, không còn lỗi nghiêm trọng và hoàn thiện tài liệu.
+
+- [ ] `TASK-701`: Rà soát toàn bộ mã nguồn theo chuẩn SOLID, Clean Code và Naming Conventions.
+- [ ] `TASK-702`: Thực hiện kiểm thử tích hợp End-to-End (E2E) giữa React Frontend và Spring Boot Backend.
+- [ ] `TASK-703`: Đảm bảo xử lý lỗi trơn tru trên UI khi Backend mất kết nối hoặc trả về lỗi Validation.
+- [ ] `TASK-704`: Cấu hình `Dockerfile` cho Frontend và Backend.
+- [ ] `TASK-705`: Xây dựng `docker-compose.yml` chạy đồng thời PostgreSQL, Backend và Frontend.
+- [ ] `TASK-706`: Viết tài liệu API với Swagger/OpenAPI (`springdoc-openapi`).
+- [ ] `TASK-707`: Kiểm tra Responsive, accessibility và hiệu năng tải trang.
+
+---
+
+## 🎯 Tiêu chuẩn Đánh giá Hoàn thành (Definition of Done - DoD)
+
+1. **Tính năng**: Thực thi đúng mô tả functional scope trong MVP.
+2. **Kiểm thử**: Đạt mốc kiểm thử unit test cần thiết cho các Service chính.
+3. **Mã nguồn**: Tuân thủ chuẩn RESTful, Clean Architecture, SOLID và Naming Conventions.
+4. **Tài liệu**: Có OpenAPI / Swagger docs đầy đủ cho API endpoints.
+5. **Giao diện**: Đáp ứng chuẩn UX/UI hiện đại, mượt mà và không có lỗi UI phát sinh.
