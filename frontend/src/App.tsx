@@ -6,6 +6,8 @@ import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { SchedulePage } from './pages/SchedulePage';
+import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,14 +32,28 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
                 <Route path="/" element={<Dashboard />} />
-                <Route path="/schedule" element={<div className="text-white">Trang Lịch trình (Milestone 3)</div>} />
-                <Route path="/meals" element={<div className="text-white">Trang Nhật ký bữa ăn (Milestone 4)</div>} />
-                <Route path="/ai-assistant" element={<div className="text-white">Trợ lý AI (Milestone 6)</div>} />
+                <Route path="/schedule" element={<SchedulePage />} />
+                <Route path="/meals" element={<div className="text-slate-700">Trang Nhật ký bữa ăn (Milestone 4)</div>} />
+                <Route path="/ai-assistant" element={<div className="text-slate-700">Trợ lý AI (Milestone 6)</div>} />
               </Route>
             </Route>
           </Routes>
         </Router>
       </AuthProvider>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#1e293b',
+            color: '#f1f5f9',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '12px',
+            fontSize: '13px',
+          },
+          success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+        }}
+      />
     </QueryClientProvider>
   );
 }

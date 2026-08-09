@@ -27,3 +27,9 @@ yarn-error.log*
 # System Files
 .DS_Store
 Thumbs.db
+
+#agents
+.agents
+
+#codegraph
+.codegraph

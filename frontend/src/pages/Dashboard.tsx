@@ -7,43 +7,104 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+
+      {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Xin chào, {user?.fullName} 👋</h1>
-          <p className="text-sm text-slate-400">Dưới đây là tổng quan lịch trình & dinh dưỡng của bạn hôm nay.</p>
+          <h1 className="text-2xl font-bold" style={{ color: '#1E293B' }}>
+            Xin chào, {user?.fullName} 👋
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#64748B' }}>
+            Dưới đây là tổng quan lịch trình &amp; dinh dưỡng của bạn hôm nay.
+          </p>
         </div>
-        <div className="flex items-center gap-2 rounded-xl bg-indigo-500/10 border border-indigo-500/30 px-3 py-1.5 text-xs font-semibold text-indigo-300">
+
+        {/* AI Badge */}
+        <div
+          className="flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold"
+          style={{
+            background: 'rgba(79, 70, 229, 0.08)',
+            border: '1px solid rgba(79, 70, 229, 0.25)',
+            color: '#4F46E5',
+          }}
+        >
           <Sparkles className="h-4 w-4" />
           <span>LifeSync AI Active</span>
         </div>
       </div>
 
+      {/* ── Stat Cards ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-card rounded-2xl p-6 border border-slate-800">
+
+        {/* Card 1: Lịch trình hôm nay */}
+        <div
+          className="rounded-2xl p-6 surface-card"
+          style={{ borderRadius: '16px' }}
+        >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-slate-400">Lịch trình hôm nay</h3>
-            <Calendar className="h-5 w-5 text-indigo-400" />
+            <h3 className="text-sm font-semibold" style={{ color: '#64748B' }}>
+              Lịch trình hôm nay
+            </h3>
+            <div
+              className="p-2 rounded-lg"
+              style={{ background: 'rgba(79, 70, 229, 0.08)', border: '1px solid rgba(79, 70, 229, 0.15)' }}
+            >
+              <Calendar className="h-4 w-4" style={{ color: '#4F46E5' }} />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-white">0 Nhiệm vụ</p>
-          <span className="text-xs text-slate-500 mt-2 block">Mọi việc đã sẵn sàng</span>
+          <p className="text-3xl font-bold" style={{ color: '#1E293B' }}>
+            0 Nhiệm vụ
+          </p>
+          <span className="text-xs mt-2 block" style={{ color: '#94A3B8' }}>
+            Mọi việc đã sẵn sàng
+          </span>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 border border-slate-800">
+        {/* Card 2: Calories */}
+        <div
+          className="rounded-2xl p-6 surface-card"
+          style={{ borderRadius: '16px' }}
+        >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-slate-400">Calories nạp vào</h3>
-            <UtensilsCrossed className="h-5 w-5 text-purple-400" />
+            <h3 className="text-sm font-semibold" style={{ color: '#64748B' }}>
+              Calories nạp vào
+            </h3>
+            <div
+              className="p-2 rounded-lg"
+              style={{ background: 'rgba(168, 85, 247, 0.08)', border: '1px solid rgba(168, 85, 247, 0.15)' }}
+            >
+              <UtensilsCrossed className="h-4 w-4" style={{ color: '#a855f7' }} />
+            </div>
           </div>
-          <p className="text-3xl font-bold text-white">0 / 2,000 kcal</p>
-          <span className="text-xs text-slate-500 mt-2 block">Chưa ghi nhận bữa ăn</span>
+          <p className="text-3xl font-bold" style={{ color: '#1E293B' }}>
+            0 / 2,000 kcal
+          </p>
+          <span className="text-xs mt-2 block" style={{ color: '#94A3B8' }}>
+            Chưa ghi nhận bữa ăn
+          </span>
         </div>
 
-        <div className="glass-card rounded-2xl p-6 border border-slate-800">
+        {/* Card 3: Gợi ý AI */}
+        <div
+          className="rounded-2xl p-6 surface-card"
+          style={{ borderRadius: '16px' }}
+        >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-medium text-slate-400">Gợi ý AI</h3>
-            <Bot className="h-5 w-5 text-emerald-400" />
+            <h3 className="text-sm font-semibold" style={{ color: '#64748B' }}>
+              Gợi ý AI
+            </h3>
+            <div
+              className="p-2 rounded-lg"
+              style={{ background: 'rgba(5, 150, 105, 0.08)', border: '1px solid rgba(5, 150, 105, 0.15)' }}
+            >
+              <Bot className="h-4 w-4" style={{ color: '#059669' }} />
+            </div>
           </div>
-          <p className="text-sm text-slate-300">"Tạo lịch làm việc đầu tiên để AI có thể phân tích năng suất của bạn."</p>
+          <p className="text-sm leading-relaxed" style={{ color: '#475569' }}>
+            "Tạo lịch làm việc đầu tiên để AI có thể phân tích năng suất của bạn."
+          </p>
         </div>
+
       </div>
     </div>
   );
