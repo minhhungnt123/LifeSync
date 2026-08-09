@@ -1,21 +1,245 @@
 @import "tailwindcss";
 
+/* ── Google Fonts ──────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ════════════════════════════════════════════════════════════════
+   LIGHT THEME COLOR SYSTEM
+   ─────────────────────────────────────────
+   Background   : #F5F7FF  (lavender-white)
+   Surface      : #FFFFFF  (pure white cards)
+   Surface Alt  : #EEF2FF  (indigo-tinted)
+   Primary      : #4F46E5  (indigo)
+   Primary Light: #E0E7FF
+   Emerald      : #059669
+   Emerald Light: #D1FAE5
+   Text Primary : #1E293B
+   Text Muted   : #64748B
+   Border       : #E2E8F0
+   ════════════════════════════════════════════════════════════════ */
+
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white min-h-screen;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    @apply text-slate-800 antialiased selection:bg-indigo-500 selection:text-white min-h-screen;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #F5F7FF;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 80% -5%, rgba(99, 102, 241, 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 5% 90%, rgba(5, 150, 105, 0.05) 0%, transparent 50%);
+    background-attachment: fixed;
   }
 }
 
-/* Glassmorphism utility classes */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* ── Surface utilities ──────────────────────────────────────────────────────── */
+.surface-card {
+  background: #ffffff;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(99, 102, 241, 0.06);
 }
 
-.glass-card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.surface-alt {
+  background: #EEF2FF;
+  border: 1px solid #C7D2FE;
+}
+
+/* ── Gradient Borders (light) ───────────────────────────────────────────────── */
+.gradient-border-blue {
+  position: relative;
+  background: #ffffff;
+}
+.gradient-border-blue::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.5), rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.08));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.gradient-border-green {
+  position: relative;
+  background: #ffffff;
+}
+.gradient-border-green::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.5), rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.08));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ── Animations ─────────────────────────────────────────────────────────────── */
+@keyframes pulse-glow-light {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3); }
+  50%       { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15); }
+}
+
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float-up {
+  animation: float-up 0.25s ease-out forwards;
+}
+
+/* ── FullCalendar LIGHT Theme ────────────────────────────────────────────────── */
+.calendar-light-theme .fc {
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: #F8FAFF;
+  --fc-border-color: #E2E8F0;
+  --fc-button-bg-color: #ffffff;
+  --fc-button-border-color: #E2E8F0;
+  --fc-button-hover-bg-color: #EEF2FF;
+  --fc-button-hover-border-color: #C7D2FE;
+  --fc-button-active-bg-color: #4F46E5;
+  --fc-button-active-border-color: #4338CA;
+  --fc-today-bg-color: rgba(79, 70, 229, 0.05);
+  --fc-now-indicator-color: #EF4444;
+  color: #1E293B;
+}
+
+.calendar-light-theme .fc .fc-toolbar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+/* Slot time labels */
+.calendar-light-theme .fc .fc-timegrid-slot-label {
+  color: #94A3B8;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+/* Slot rows */
+.calendar-light-theme .fc .fc-timegrid-slot {
+  height: 2.5rem;
+  transition: background 0.12s ease;
+}
+.calendar-light-theme .fc .fc-timegrid-slot:hover {
+  background: rgba(79, 70, 229, 0.03);
+}
+
+/* Col header */
+.calendar-light-theme .fc .fc-col-header-cell {
+  background: #F8FAFF;
+  padding: 10px 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  font-weight: 600;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+/* Grid borders */
+.calendar-light-theme .fc-theme-standard td,
+.calendar-light-theme .fc-theme-standard th {
+  border-color: #F1F5F9;
+}
+
+/* Now indicator */
+.calendar-light-theme .fc .fc-timegrid-now-indicator-line {
+  border-color: #EF4444;
+  border-width: 2px;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.3);
+}
+.calendar-light-theme .fc .fc-timegrid-now-indicator-arrow {
+  border-color: #EF4444;
+  animation: pulse-glow-light 2s ease-in-out infinite;
+}
+
+/* Event blocks */
+.calendar-light-theme .fc-event {
+  border-radius: 8px;
+  border-left-width: 3px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.calendar-light-theme .fc-event:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(99, 102, 241, 0.15);
+}
+
+/* Status indicators */
+.calendar-light-theme .event-completed .fc-event-main {
+  text-decoration: line-through;
+  opacity: 0.55;
+}
+.calendar-light-theme .event-cancelled {
+  opacity: 0.4;
+  filter: grayscale(50%);
+}
+
+/* Scrollbar */
+.calendar-light-theme .fc-scroller::-webkit-scrollbar {
+  width: 4px;
+}
+.calendar-light-theme .fc-scroller::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+.calendar-light-theme .fc-scroller::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 2px;
+}
+
+/* ── Month Carousel Cards (light) ───────────────────────────────────────────── */
+.month-card-selected {
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  box-shadow:
+    0 8px 24px rgba(79, 70, 229, 0.25),
+    0 2px 6px rgba(15, 23, 42, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.month-card-neighbor {
+  background: #ffffff;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+  color: #64748B;
+}
+
+.month-card-neighbor:hover {
+  background: #EEF2FF;
+  border-color: #C7D2FE;
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.12);
+  color: #4F46E5;
+}
+
+/* ── Week day row (light) ───────────────────────────────────────────────────── */
+.week-day-row {
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.12s ease;
+}
+.week-day-row:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* ── CTA Button (light) ─────────────────────────────────────────────────────── */
+.btn-glow-blue {
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3), 0 1px 3px rgba(15, 23, 42, 0.1);
+  transition: all 0.2s ease;
+}
+.btn-glow-blue:hover {
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4), 0 2px 6px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
+}
+.btn-glow-blue:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2);
 }

@@ -10,7 +10,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **M1** | Project Setup & Architecture Foundation | Khởi tạo cấu trúc dự án Full-stack, thiết lập DB, hệ thống Base Entity & UI Design System | 1 Tuần | ✅ Hoàn thành |
 | **M2** | Authentication & User Management | Xây dựng cơ chế xác thực JWT, Đăng ký / Đăng nhập, bảo mật API và Quản lý User Profile | 1 Tuần | ✅ Hoàn thành |
-| **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | 1.5 Tuần | 🔄 Đang triển khai |
+| **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | 1.5 Tuần | ✅ Hoàn thành |
 | **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | 1 Tuần | ⏳ Chờ thực hiện |
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | 1 Tuần | ⏳ Chờ thực hiện |
 | **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | 1.5 Tuần | ⏳ Chờ thực hiện |
@@ -60,23 +60,23 @@
 
 ---
 
-### 📅 Milestone 3: Time & Schedule Management
+### 📅 Milestone 3: Time & Schedule Management (✅ HOÀN THÀNH)
 
 > **Mục tiêu**: Cho phép người dùng tạo, sửa, xóa và quản lý lịch trình cá nhân trực quan.
 
 #### Backend
-- [ ] `TASK-301`: Thiết kế Entity `Schedule` (`id`, `userId`, `title`, `description`, `startTime`, `endTime`, `category`, `status`, `priority`).
-- [ ] `TASK-302`: Tạo `ScheduleRepository` hỗ trợ query lọc lịch theo khoảng thời gian (`findByUserIdAndStartTimeBetween`).
-- [ ] `TASK-303`: Viết `ScheduleService` thực hiện CRUD và validation logic (Thời gian kết thúc phải sau thời gian bắt đầu).
-- [ ] `TASK-304`: Xây dựng `ScheduleController` (`/api/v1/schedules`).
-- [ ] `TASK-305`: Viết Unit Test cho `ScheduleService` (chú trọng kiểm thử trùng lịch / trùng khoảng thời gian).
+- [x] `TASK-301`: Thiết kế Entity `Schedule` (`id`, `userId`, `title`, `description`, `startTime`, `endTime`, `category`, `status`, `priority`).
+- [x] `TASK-302`: Tạo `ScheduleRepository` hỗ trợ query lọc lịch theo khoảng thời gian (`findByUserIdAndStartTimeBetween`).
+- [x] `TASK-303`: Viết `ScheduleService` thực hiện CRUD và validation logic (Thời gian kết thúc phải sau thời gian bắt đầu).
+- [x] `TASK-304`: Xây dựng `ScheduleController` (`/api/v1/schedules`).
+- [x] `TASK-305`: Viết Unit Test cho `ScheduleService` (chú trọng kiểm thử trùng lịch / trùng khoảng thời gian).
 
 #### Frontend
-- [ ] `TASK-306`: Cấu hình và nhúng `FullCalendar` (Month, Week, Day views).
-- [ ] `TASK-307`: Kết nối React Query để fetch dữ liệu sự kiện từ Backend hiển thị lên Calendar.
-- [ ] `TASK-308`: Xây dựng Modal Form thêm/sửa Sự kiện (Create/Edit Schedule Modal) với TimePicker & Category Selector.
-- [ ] `TASK-309`: Thêm tính năng Kéo-thả (Drag & Drop) hoặc Đổi kích thước (Resize) để cập nhật thời gian sự kiện trên Calendar.
-- [ ] `TASK-310`: Xây dựng bộ lọc lịch trình theo Phân loại (Category Filter: Work, Study, Health, Personal).
+- [x] `TASK-306`: Cấu hình và nhúng `FullCalendar` (Month, Week, Day views).
+- [x] `TASK-307`: Kết nối React Query để fetch dữ liệu sự kiện từ Backend hiển thị lên Calendar.
+- [x] `TASK-308`: Xây dựng Modal Form thêm/sửa Sự kiện (Create/Edit Schedule Modal) với TimePicker & Category Selector.
+- [x] `TASK-309`: Thêm tính năng Kéo-thả (Drag & Drop) hoặc Đổi kích thước (Resize) để cập nhật thời gian sự kiện trên Calendar.
+- [x] `TASK-310`: Xây dựng bộ lọc lịch trình theo Phân loại (Category Filter: Work, Study, Health, Personal).
 
 ---
 
