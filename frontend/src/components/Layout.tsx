@@ -1,18 +1,15 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import {
   Sparkles,
   LayoutDashboard,
   Calendar,
   UtensilsCrossed,
   Bot,
-  LogOut,
-  User as UserIcon
 } from 'lucide-react';
+import { UserProfile } from './UserProfile';
 
 export const Layout: React.FC = () => {
-  const { user, logout } = useAuth();
   const location = useLocation();
 
   const navItems = [
@@ -23,11 +20,11 @@ export const Layout: React.FC = () => {
   ];
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#F5F7FF' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#F5F7FF' }}>
 
       {/* ── Sidebar ─────────────────────────────────────────────────────── */}
       <aside
-        className="w-64 p-4 flex flex-col justify-between"
+        className="w-64 h-screen shrink-0 p-4 flex flex-col justify-between overflow-y-auto"
         style={{
           background: '#ffffff',
           borderRight: '1px solid #E2E8F0',
@@ -35,10 +32,10 @@ export const Layout: React.FC = () => {
         }}
       >
         <div>
-          {/* Logo */}
+          {/* Logo Header */}
           <div className="flex items-center gap-3 px-2 py-4 mb-6">
             <div
-              className="flex h-10 w-10 items-center justify-center rounded-xl"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
               style={{
                 background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
                 boxShadow: '0 4px 12px rgba(79, 70, 229, 0.35)',
@@ -106,54 +103,14 @@ export const Layout: React.FC = () => {
           </nav>
         </div>
 
-        {/* User Info & Logout */}
+        {/* User Info & Account Popover */}
         <div style={{ borderTop: '1px solid #E2E8F0', paddingTop: '16px' }}>
-          <div
-            className="flex items-center justify-between rounded-xl p-3"
-            style={{ background: '#F8FAFF', border: '1px solid #E2E8F0' }}
-          >
-            <div className="flex items-center gap-2.5 overflow-hidden">
-              <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                style={{
-                  background: '#EEF2FF',
-                  border: '2px solid #C7D2FE',
-                  color: '#4F46E5',
-                }}
-              >
-                <UserIcon className="h-4 w-4" />
-              </div>
-              <div className="truncate">
-                <p className="text-xs font-semibold truncate" style={{ color: '#1E293B' }}>
-                  {user?.fullName}
-                </p>
-                <p className="text-[11px] truncate" style={{ color: '#94A3B8' }}>
-                  {user?.email}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={logout}
-              title="Đăng xuất"
-              className="rounded-lg p-1.5 transition-colors"
-              style={{ color: '#94A3B8' }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = '#FEE2E2';
-                (e.currentTarget as HTMLButtonElement).style.color = '#EF4444';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-                (e.currentTarget as HTMLButtonElement).style.color = '#94A3B8';
-              }}
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </div>
+          <UserProfile />
         </div>
       </aside>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
-      <main className="flex-1 overflow-y-auto p-6 lg:p-8">
+      <main className="flex-1 min-w-0 h-screen overflow-y-auto overflow-x-hidden p-6 lg:p-8">
         <Outlet />
       </main>
     </div>

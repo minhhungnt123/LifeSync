@@ -36,6 +36,10 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Người dùng chưa được xác thực!"));
+        }
         UserResponse userResponse = authService.getCurrentUser(userDetails.getUsername());
         return ResponseEntity.ok(ApiResponse.success(userResponse, "Lấy thông tin người dùng thành công!"));
     }

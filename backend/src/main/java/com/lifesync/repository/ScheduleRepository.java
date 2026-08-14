@@ -13,10 +13,12 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
+    List<Schedule> findByUserIdOrderByStartTimeAsc(Long userId);
+
     @Query("SELECT s FROM Schedule s WHERE s.user.id = :userId " +
-           "AND (:start IS NULL OR s.endTime >= :start) " +
-           "AND (:end IS NULL OR s.startTime <= :end) " +
-           "AND (:category IS NULL OR s.category = :category) " +
+           "AND (cast(:start as string) IS NULL OR s.endTime >= :start) " +
+           "AND (cast(:end as string) IS NULL OR s.startTime <= :end) " +
+           "AND (cast(:category as string) IS NULL OR s.category = :category) " +
            "ORDER BY s.startTime ASC")
     List<Schedule> findSchedulesByFilter(@Param("userId") Long userId,
                                          @Param("start") LocalDateTime start,
@@ -25,7 +27,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     @Query("SELECT s FROM Schedule s WHERE s.user.id = :userId " +
            "AND s.startTime < :endTime AND s.endTime > :startTime " +
-           "AND (:excludeId IS NULL OR s.id <> :excludeId)")
+           "AND (cast(:excludeId as string) IS NULL OR s.id <> :excludeId)")
     List<Schedule> findOverlappingSchedules(@Param("userId") Long userId,
                                            @Param("startTime") LocalDateTime startTime,
                                            @Param("endTime") LocalDateTime endTime,

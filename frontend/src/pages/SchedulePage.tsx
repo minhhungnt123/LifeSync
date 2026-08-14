@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { scheduleApi } from '../api/scheduleApi';
 import type { Schedule, ScheduleCategory, ScheduleRequest } from '../types/schedule';
 import { ScheduleModal } from '../components/ScheduleModal';
+import { RoutineTimePickerModal } from '../components/schedule/RoutineTimePickerModal';
 import { MonthCarousel } from '../components/schedule/MonthCarousel';
 import { WeekMiniPicker } from '../components/schedule/WeekMiniPicker';
 import { DayScheduleCompactList } from '../components/schedule/DayScheduleCompactList';
@@ -25,6 +26,14 @@ export const SchedulePage: React.FC = () => {
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [defaultDates, setDefaultDates] = useState<{ start: string; end: string } | null>(null);
   const [isDayViewCollapsed, setIsDayViewCollapsed] = useState<boolean>(true);
+
+  // States for Quick Routine Time Picker Modal
+  const [activeRoutine, setActiveRoutine] = useState<{
+    title: string;
+    durationMinutes: number;
+    category: ScheduleCategory;
+  } | null>(null);
+  const [isRoutineTimeModalOpen, setIsRoutineTimeModalOpen] = useState<boolean>(false);
 
   const dayCalRef = useRef<any>(null);
 
@@ -97,32 +106,31 @@ export const SchedulePage: React.FC = () => {
     setIsModalOpen(true);
   }, [selectedDate]);
 
-  const handleApplyRoutine = useCallback(async (title: string, durationMinutes: number, category: ScheduleCategory) => {
-    const baseDate = new Date(selectedDate);
-    const now = new Date();
+  const handleApplyRoutine = useCallback((title: string, durationMinutes: number, category: ScheduleCategory) => {
+    setActiveRoutine({ title, durationMinutes, category });
+    setIsRoutineTimeModalOpen(true);
+  }, []);
 
-    if (toDateOnly(selectedDate) === toDateOnly(now)) {
-      baseDate.setHours(now.getHours(), 0, 0, 0);
-    } else {
-      baseDate.setHours(8, 0, 0, 0);
-    }
-
-    const endDate = new Date(baseDate.getTime() + durationMinutes * 60 * 1000);
-
+  const handleConfirmRoutine = useCallback(async (data: {
+    title: string;
+    startTimeISO: string;
+    endTimeISO: string;
+    category: ScheduleCategory;
+  }) => {
     try {
       await createMutation.mutateAsync({
-        title,
-        startTime: baseDate.toISOString(),
-        endTime: endDate.toISOString(),
-        category,
+        title: data.title,
+        startTime: data.startTimeISO,
+        endTime: data.endTimeISO,
+        category: data.category,
         status: 'PENDING',
         priority: 'MEDIUM',
       });
-      toast.success(`⚡ Đã thêm nhanh thói quen "${title}"!`);
+      toast.success(`⚡ Đã thêm nhanh thói quen "${data.title}" vào lịch trình!`);
     } catch {
       toast.error('Không thể thêm thói quen!');
     }
-  }, [selectedDate, createMutation]);
+  }, [createMutation]);
 
   const handleSelectSchedule = useCallback((schedule: Schedule) => {
     setSelectedSchedule(schedule);
@@ -186,54 +194,31 @@ export const SchedulePage: React.FC = () => {
   }, [schedules, selectedDate]);
 
   return (
-    <div className="p-4 lg:p-6 max-w-screen-2xl mx-auto space-y-4">
+    <div className="w-full space-y-4">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 rounded-2xl"
-        style={{
-          background: 'rgba(13, 15, 20, 0.8)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.07)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04)',
-        }}
-      >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 rounded-2xl bg-white border border-slate-200/80 shadow-sm">
         <div className="flex items-center space-x-3">
-          <div
-            className="p-2.5 rounded-xl"
-            style={{
-              background: 'linear-gradient(135deg, rgba(59,130,246,0.2), rgba(99,102,241,0.1))',
-              border: '1px solid rgba(99,102,241,0.3)',
-              boxShadow: '0 0 12px rgba(99,102,241,0.2)',
-            }}
-          >
-            <CalendarIcon className="w-5 h-5 text-indigo-400" />
+          <div className="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 shadow-2xs">
+            <CalendarIcon className="w-5 h-5 text-indigo-600" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-tight">Quản lý Lịch trình</h1>
-            <p className="text-xs text-gray-400 mt-0.5">Theo dõi và sắp xếp thời gian công việc, học tập & sức khỏe</p>
+            <h1 className="text-xl font-bold text-slate-800 tracking-tight">Quản lý Lịch trình</h1>
+            <p className="text-xs text-slate-500 mt-0.5">Theo dõi và sắp xếp thời gian công việc, học tập & sức khỏe</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {!isToday && (
             <button
               onClick={() => syncToDate(today)}
-              className="px-4 py-2 rounded-xl text-xs font-medium transition-all hover:bg-white/10 text-gray-300"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-              }}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-indigo-600 bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 transition-all active:scale-95"
             >
               ⬅ Hôm nay
             </button>
           )}
           <button
             onClick={handleOpenAddModal}
-            className="btn-glow-blue px-4 py-2.5 rounded-xl text-white font-semibold flex items-center gap-2 text-sm transition-transform active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #7c3aed 100%)',
-              border: '1px solid rgba(255,255,255,0.15)',
-            }}
+            className="px-4 py-2.5 rounded-xl text-white font-bold bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200 flex items-center gap-2 text-sm transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" /> Thêm lịch mới
           </button>
@@ -268,11 +253,11 @@ export const SchedulePage: React.FC = () => {
           <p className="text-sm font-medium" style={{ color: '#64748B' }}>Đang tải lịch trình...</p>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row gap-4 items-start">
+        <div className="flex flex-col lg:flex-row gap-4 items-start w-full min-w-0">
 
           {/* ── Day View — 60% ─────────────────────────────────────────── */}
           <div
-            className="w-full lg:w-[60%] gradient-border-blue rounded-2xl overflow-hidden calendar-light-theme flex flex-col transition-all duration-300"
+            className="w-full lg:w-[60%] min-w-0 gradient-border-blue rounded-2xl overflow-hidden calendar-light-theme flex flex-col transition-all duration-300"
             style={{ background: '#ffffff', boxShadow: '0 4px 24px rgba(99,102,241,0.10), 0 1px 4px rgba(15,23,42,0.06)' }}
           >
             {/* Day panel header */}
@@ -402,9 +387,9 @@ export const SchedulePage: React.FC = () => {
             </div>
           </div>
 
-          {/* ── Week Mini Picker — 40% ─────────────────────────────────── */}
+          {/* ── Week View — 40% ─────────────────────────────────────────── */}
           <div
-            className="w-full lg:w-[40%] gradient-border-green rounded-2xl overflow-hidden flex flex-col"
+            className="w-full lg:w-[40%] min-w-0 gradient-border-green rounded-2xl overflow-hidden flex flex-col"
             style={{ background: '#ffffff', boxShadow: '0 4px 24px rgba(5,150,105,0.08), 0 1px 4px rgba(15,23,42,0.06)' }}
           >
             {/* Week panel header */}
@@ -472,7 +457,7 @@ export const SchedulePage: React.FC = () => {
         </div>
       )}
 
-      {/* ── Modal ──────────────────────────────────────────────────────── */}
+      {/* ── Modals ──────────────────────────────────────────────────────── */}
       <ScheduleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -481,6 +466,16 @@ export const SchedulePage: React.FC = () => {
         initialSchedule={selectedSchedule}
         defaultDates={defaultDates}
         isLoading={createMutation.isPending || updateMutation.isPending || deleteMutation.isPending}
+      />
+
+      {/* 2-Column Routine Time Picker Modal */}
+      <RoutineTimePickerModal
+        isOpen={isRoutineTimeModalOpen}
+        onClose={() => setIsRoutineTimeModalOpen(false)}
+        routine={activeRoutine}
+        selectedDate={selectedDate}
+        daySchedules={selectedDaySchedules}
+        onConfirm={handleConfirmRoutine}
       />
     </div>
   );

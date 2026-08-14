@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { X, Calendar, Clock, AlertTriangle, Trash2, Save, Tag, Flag, Timer } from 'lucide-react';
+import { X, Clock, AlertTriangle, Trash2, Save, Tag, Flag, Timer } from 'lucide-react';
 import type { Schedule, ScheduleCategory, SchedulePriority, ScheduleRequest, ScheduleStatus } from '../types/schedule';
 
 interface ScheduleModalProps {
@@ -13,17 +13,17 @@ interface ScheduleModalProps {
 }
 
 const CATEGORY_OPTIONS: { label: string; value: ScheduleCategory; color: string; emoji: string }[] = [
-  { label: 'Công việc', value: 'WORK', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', emoji: '💼' },
-  { label: 'Học tập', value: 'STUDY', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', emoji: '📚' },
-  { label: 'Sức khỏe', value: 'HEALTH', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', emoji: '🏃' },
-  { label: 'Cá nhân', value: 'PERSONAL', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30', emoji: '🏠' },
+  { label: 'Công việc', value: 'WORK', color: 'bg-blue-50 text-blue-700 border-blue-200', emoji: '💼' },
+  { label: 'Học tập', value: 'STUDY', color: 'bg-purple-50 text-purple-700 border-purple-200', emoji: '📚' },
+  { label: 'Sức khỏe', value: 'HEALTH', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', emoji: '🏃' },
+  { label: 'Cá nhân', value: 'PERSONAL', color: 'bg-orange-50 text-orange-700 border-orange-200', emoji: '🏠' },
 ];
 
 const PRIORITY_OPTIONS: { label: string; value: SchedulePriority; color: string }[] = [
-  { label: 'Thấp', value: 'LOW', color: 'text-gray-400' },
-  { label: 'Trung bình', value: 'MEDIUM', color: 'text-blue-400' },
-  { label: 'Cao', value: 'HIGH', color: 'text-amber-400' },
-  { label: 'Khẩn cấp', value: 'URGENT', color: 'text-rose-400 font-bold' },
+  { label: 'Thấp', value: 'LOW', color: 'text-slate-500' },
+  { label: 'Trung bình', value: 'MEDIUM', color: 'text-blue-600' },
+  { label: 'Cao', value: 'HIGH', color: 'text-amber-600' },
+  { label: 'Khẩn cấp', value: 'URGENT', color: 'text-rose-600 font-bold' },
 ];
 
 const STATUS_OPTIONS: { label: string; value: ScheduleStatus }[] = [
@@ -179,21 +179,21 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const selectedCategoryOption = CATEGORY_OPTIONS.find((c) => c.value === category);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="relative w-full max-w-lg bg-gray-900/95 border border-gray-800 rounded-2xl shadow-2xl overflow-hidden text-gray-100 animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 overflow-y-auto">
+      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden text-slate-800 animate-in fade-in zoom-in duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800/80 bg-gray-900/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/60">
           <div className="flex items-center space-x-2">
-            <div className={`p-2 rounded-lg border text-sm ${selectedCategoryOption?.color || 'bg-blue-500/10 border-blue-500/20 text-blue-400'}`}>
+            <div className={`p-2 rounded-xl border text-sm ${selectedCategoryOption?.color || 'bg-indigo-50 border-indigo-200 text-indigo-700'}`}>
               <span>{selectedCategoryOption?.emoji || '📅'}</span>
             </div>
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-base font-bold text-slate-800">
               {initialSchedule ? 'Chỉnh sửa sự kiện' : 'Thêm sự kiện mới'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -202,14 +202,14 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {errorMessage && (
-            <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm flex items-center space-x-2">
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center space-x-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {overlapWarning && (
-            <div className="p-3.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 text-sm flex items-start space-x-2">
+            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-start space-x-2">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{overlapWarning}</span>
             </div>
@@ -217,15 +217,15 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">
-              Tiêu đề sự kiện <span className="text-rose-400">*</span>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+              Tiêu đề sự kiện <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Nhập tiêu đề công việc / lịch hẹn..."
-              className="w-full px-4 py-2.5 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium"
               required
             />
           </div>
@@ -234,38 +234,38 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1.5 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" /> Bắt đầu <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" /> Bắt đầu <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1.5 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" /> Kết thúc <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-slate-400" /> Kết thúc <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="datetime-local"
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
                   required
                 />
               </div>
             </div>
             {/* Duration Badge */}
             {duration ? (
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
-                <Timer className="w-3.5 h-3.5" />
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">
+                <Timer className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Thời lượng: <strong>{duration}</strong></span>
               </div>
             ) : startTime && endTime ? (
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-rose-400">
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-rose-500 font-medium">
                 <AlertTriangle className="w-3.5 h-3.5" />
                 <span>Thời gian kết thúc phải sau thời gian bắt đầu</span>
               </div>
@@ -274,8 +274,8 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
           {/* Category Selector */}
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-2 flex items-center gap-1">
-              <Tag className="w-3.5 h-3.5" /> Phân loại
+            <label className="block text-xs font-semibold text-slate-600 mb-2 flex items-center gap-1">
+              <Tag className="w-3.5 h-3.5 text-slate-400" /> Phân loại
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {CATEGORY_OPTIONS.map((opt) => {
@@ -285,10 +285,10 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
                     key={opt.value}
                     type="button"
                     onClick={() => setCategory(opt.value)}
-                    className={`px-3 py-2 text-xs font-medium rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
+                    className={`px-3 py-2 text-xs font-semibold rounded-xl border transition-all flex items-center justify-center gap-1.5 ${
                       isSelected
-                        ? opt.color + ' ring-2 ring-white/10 font-semibold shadow-md'
-                        : 'bg-gray-800/40 border-gray-700/40 text-gray-400 hover:bg-gray-800'
+                        ? opt.color + ' ring-2 ring-indigo-500/20 shadow-xs'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
                     <span>{opt.emoji}</span>
@@ -302,30 +302,30 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
           {/* Status & Priority */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Trạng thái</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Trạng thái</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as ScheduleStatus)}
-                className="w-full px-3.5 py-2 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
               >
                 {STATUS_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-gray-900 text-white">
+                  <option key={opt.value} value={opt.value} className="bg-white text-slate-800">
                     {opt.label}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5 flex items-center gap-1">
-                <Flag className="w-3.5 h-3.5" /> Độ ưu tiên
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5 flex items-center gap-1">
+                <Flag className="w-3.5 h-3.5 text-slate-400" /> Độ ưu tiên
               </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as SchedulePriority)}
-                className="w-full px-3.5 py-2 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
+                className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
               >
                 {PRIORITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value} className="bg-gray-900 text-white">
+                  <option key={opt.value} value={opt.value} className="bg-white text-slate-800">
                     {opt.label}
                   </option>
                 ))}
@@ -335,36 +335,36 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Mô tả chi tiết</label>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Mô tả chi tiết</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ghi chú thêm về nội dung công việc..."
               rows={3}
-              className="w-full px-4 py-2.5 bg-gray-800/60 border border-gray-700/60 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm resize-none"
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium resize-none"
             />
           </div>
 
           {/* Modal Footer */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-800/80">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
             {/* Inline Delete Confirmation */}
             {initialSchedule && onDelete ? (
               <div className="flex items-center gap-2">
                 {deleteConfirmPending ? (
                   <>
-                    <span className="text-xs text-rose-400 font-medium">Xác nhận xóa?</span>
+                    <span className="text-xs text-rose-600 font-semibold">Xác nhận xóa?</span>
                     <button
                       type="button"
                       onClick={handleDeleteConfirm}
                       disabled={isLoading}
-                      className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white rounded-lg text-xs font-semibold transition-colors"
+                      className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors"
                     >
                       Xóa ngay
                     </button>
                     <button
                       type="button"
                       onClick={() => setDeleteConfirmPending(false)}
-                      className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-xs font-medium transition-colors"
+                      className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold transition-colors"
                     >
                       Thôi
                     </button>
@@ -374,7 +374,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
                     type="button"
                     onClick={handleDeleteClick}
                     disabled={isLoading}
-                    className="px-4 py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 rounded-xl text-xs font-medium transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5"
                   >
                     <Trash2 className="w-3.5 h-3.5" /> Xóa sự kiện
                   </button>
@@ -389,14 +389,14 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 type="button"
                 onClick={onClose}
                 disabled={isLoading}
-                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs font-medium transition-colors"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-medium shadow-lg shadow-blue-500/25 transition-all flex items-center gap-1.5"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-200 transition-all flex items-center gap-1.5 active:scale-95"
               >
                 <Save className="w-3.5 h-3.5" /> {isLoading ? 'Đang lưu...' : 'Lưu sự kiện'}
               </button>
