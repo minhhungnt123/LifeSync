@@ -17,18 +17,15 @@ export interface RoutineTemplateRequest {
 }
 
 export const routineTemplateApi = {
-  getTemplates: async (): Promise<ApiResponse<RoutineTemplateResponse[]>> => {
-    const response = await axiosClient.get<ApiResponse<RoutineTemplateResponse[]>>('/routine-templates');
-    return response.data;
+  getTemplates: (): Promise<ApiResponse<RoutineTemplateResponse[]>> => {
+    return axiosClient.get('/routine-templates');
   },
 
-  createTemplate: async (data: RoutineTemplateRequest): Promise<ApiResponse<RoutineTemplateResponse>> => {
-    const response = await axiosClient.post<ApiResponse<RoutineTemplateResponse>>('/routine-templates', data);
-    return response.data;
+  createTemplate: (data: RoutineTemplateRequest): Promise<ApiResponse<RoutineTemplateResponse>> => {
+    return axiosClient.post('/routine-templates', data);
   },
 
-  deleteTemplate: async (id: number): Promise<ApiResponse<void>> => {
-    const response = await axiosClient.delete<ApiResponse<void>>(`/routine-templates/${id}`);
-    return response.data;
+  deleteTemplate: (id: number): Promise<ApiResponse<void>> => {
+    return axiosClient.delete(`/routine-templates/${id}`);
   },
 };

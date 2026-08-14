@@ -95,13 +95,21 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Transactional(readOnly = true)
     public List<ScheduleResponse> getUserSchedules(String userEmail, LocalDateTime start, LocalDateTime end, ScheduleCategory category) {
         User user = getUserByEmail(userEmail);
-        List<Schedule> schedules = scheduleRepository.findSchedulesByFilter(user.getId(), start, end, category);
+        
+        List<Schedule> schedules;
+        if (start == null && end == null && category == null) {
+            schedules = scheduleRepository.findByUserIdOrderByStartTimeAsc(user.getId());
+        } else {
+            schedules = scheduleRepository.findSchedulesByFilter(user.getId(), start, end, category);
+        }
 
         return schedules.stream()
                 .map(schedule -> {
                     long overlapCount = schedules.stream()
-                            .filter(other -> !other.getId().equals(schedule.getId()))
-                            .filter(other -> schedule.getStartTime().isBefore(other.getEndTime()) 
+                            .filter(other -> other.getId() != null && schedule.getId() != null && !other.getId().equals(schedule.getId()))
+                            .filter(other -> schedule.getStartTime() != null && schedule.getEndTime() != null
+                                          && other.getStartTime() != null && other.getEndTime() != null
+                                          && schedule.getStartTime().isBefore(other.getEndTime()) 
                                           && schedule.getEndTime().isAfter(other.getStartTime()))
                             .count();
 
@@ -157,16 +165,20 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private ScheduleResponse buildScheduleResponse(Schedule schedule, boolean hasOverlap, String overlapWarning) {
+        Long userId = (schedule.getUser() != null) ? schedule.getUser().getId() : null;
+        ScheduleStatus status = (schedule.getStatus() != null) ? schedule.getStatus() : ScheduleStatus.PENDING;
+        SchedulePriority priority = (schedule.getPriority() != null) ? schedule.getPriority() : SchedulePriority.MEDIUM;
+
         return ScheduleResponse.builder()
                 .id(schedule.getId())
-                .userId(schedule.getUser().getId())
+                .userId(userId)
                 .title(schedule.getTitle())
                 .description(schedule.getDescription())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())
                 .category(schedule.getCategory())
-                .status(schedule.getStatus())
-                .priority(schedule.getPriority())
+                .status(status)
+                .priority(priority)
                 .createdAt(schedule.getCreatedAt())
                 .updatedAt(schedule.getUpdatedAt())
                 .hasOverlap(hasOverlap)

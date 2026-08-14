@@ -4,7 +4,7 @@ import { Zap, Plus, X, Sparkles, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import type { ScheduleCategory } from '../../types/schedule';
 import { routineTemplateApi, type RoutineTemplateRequest } from '../../api/routineTemplateApi';
-import { CATEGORY_COLORS, CATEGORY_EMOJIS } from '../../constants/scheduleConstants';
+import { CATEGORY_EMOJIS } from '../../constants/scheduleConstants';
 
 export interface QuickRoutineDockProps {
   selectedDate: Date;
@@ -89,7 +89,6 @@ export const QuickRoutineDock: React.FC<QuickRoutineDockProps> = ({
           </div>
         ) : (
           templates.map((routine) => {
-            const catConfig = CATEGORY_COLORS[routine.category] || CATEGORY_COLORS.WORK;
             const emoji = CATEGORY_EMOJIS[routine.category] || '📅';
 
             return (

@@ -6,15 +6,15 @@
 
 ## 🗺️ Tổng quan Lộ trình phát triển (Milestone Overview)
 
-| Milestone | Tên Milestone | Mục tiêu chính | Thời lượng ước tính | Trạng thái |
-| :--- | :--- | :--- | :--- | :--- |
-| **M1** | Project Setup & Architecture Foundation | Khởi tạo cấu trúc dự án Full-stack, thiết lập DB, hệ thống Base Entity & UI Design System | 1 Tuần | ✅ Hoàn thành |
-| **M2** | Authentication & User Management | Xây dựng cơ chế xác thực JWT, Đăng ký / Đăng nhập, bảo mật API và Quản lý User Profile | 1 Tuần | ✅ Hoàn thành |
-| **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | 1.5 Tuần | ✅ Hoàn thành |
-| **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | 1 Tuần | ⏳ Chờ thực hiện |
-| **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | 1 Tuần | ⏳ Chờ thực hiện |
-| **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | 1.5 Tuần | ⏳ Chờ thực hiện |
-| **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | 1 Tuần | ⏳ Chờ thực hiện |
+| Milestone | Tên Milestone | Mục tiêu chính | Nhánh Git (Branch) | Thời lượng ước tính | Trạng thái |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **M1** | Project Setup & Architecture Foundation | Khởi tạo cấu trúc dự án Full-stack, thiết lập DB, hệ thống Base Entity & UI Design System | `main` | 1 Tuần | ✅ Hoàn thành |
+| **M2** | Authentication & User Management | Xây dựng cơ chế xác thực JWT, Đăng ký / Đăng nhập, bảo mật API và Quản lý User Profile | `main` | 1 Tuần | ✅ Hoàn thành |
+| **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | `minhhungnt123/feat/time-schedule-management` | 1.5 Tuần | ✅ Hoàn thành |
+| **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ⏳ Chờ thực hiện |
+| **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ⏳ Chờ thực hiện |
+| **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
+| **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | `minhhungnt123/feat/m7-system-polish-deployment` | 1 Tuần | ⏳ Chờ thực hiện |
 
 ---
 
@@ -83,6 +83,7 @@
 ### 🥗 Milestone 4: Meal Management
 
 > **Mục tiêu**: Nhật ký ăn uống và tính toán dinh dưỡng tự động theo ngày.
+> **Nhánh Git (Branch)**: `minhhungnt123/feat/m4-meal-management`
 
 #### Backend
 - [ ] `TASK-401`: Thiết kế Entity `MealLog` (`id`, `userId`, `mealType`, `foodName`, `calories`, `protein`, `carbs`, `fat`, `loggedAt`).
@@ -101,6 +102,7 @@
 ### 📊 Milestone 5: Dashboard & Analytics
 
 > **Mục tiêu**: Tổng hợp dữ liệu thành chỉ số tổng quan và biểu đồ trực quan.
+> **Nhánh Git (Branch)**: `minhhungnt123/feat/m5-dashboard-analytics`
 
 #### Backend
 - [ ] `TASK-501`: Viết Custom Query trong JPA/Native SQL tổng hợp số giờ hoàn thành công việc theo tuần/tháng.
@@ -118,6 +120,7 @@
 ### 🤖 Milestone 6: AI Assistant Core Integration
 
 > **Mục tiêu**: Tích hợp Trợ lý AI trả lời dựa trên dữ liệu lịch trình và bữa ăn thực tế của người dùng.
+> **Nhánh Git (Branch)**: `minhhungnt123/feat/m6-ai-assistant`
 
 #### Backend
 - [ ] `TASK-601`: Cấu hình OpenAI Client (OpenAI Java SDK hoặc REST Template / WebClient).
@@ -137,6 +140,7 @@
 ### 🛠️ Milestone 7: System Polish, Testing & Deployment
 
 > **Mục tiêu**: Đảm bảo chất lượng hệ thống, không còn lỗi nghiêm trọng và hoàn thiện tài liệu.
+> **Nhánh Git (Branch)**: `minhhungnt123/feat/m7-system-polish-deployment`
 
 - [ ] `TASK-701`: Rà soát toàn bộ mã nguồn theo chuẩn SOLID, Clean Code và Naming Conventions.
 - [ ] `TASK-702`: Thực hiện kiểm thử tích hợp End-to-End (E2E) giữa React Frontend và Spring Boot Backend.

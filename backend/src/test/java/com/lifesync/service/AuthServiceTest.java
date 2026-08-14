@@ -10,6 +10,7 @@ import com.lifesync.exception.BadRequestException;
 import com.lifesync.exception.ResourceNotFoundException;
 import com.lifesync.repository.UserRepository;
 import com.lifesync.security.JwtTokenProvider;
+import com.lifesync.service.impl.AuthServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class AuthServiceTest {
     private AuthenticationManager authenticationManager;
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     private User existingUser;
 
