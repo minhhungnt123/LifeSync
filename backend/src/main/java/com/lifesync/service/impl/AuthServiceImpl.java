@@ -8,6 +8,10 @@ import com.lifesync.entity.Role;
 import com.lifesync.entity.User;
 import com.lifesync.exception.BadRequestException;
 import com.lifesync.exception.ResourceNotFoundException;
+import com.lifesync.entity.UserProfile;
+import com.lifesync.entity.UserPreference;
+import com.lifesync.repository.UserProfileRepository;
+import com.lifesync.repository.UserPreferenceRepository;
 import com.lifesync.repository.UserRepository;
 import com.lifesync.security.JwtTokenProvider;
 import com.lifesync.service.AuthService;
@@ -23,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final UserPreferenceRepository userPreferenceRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -42,6 +48,28 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
+
+        // Auto-create default profile
+        userProfileRepository.save(UserProfile.builder()
+                .user(savedUser)
+                .heightCm(170.0)
+                .weightKg(65.0)
+                .targetWeightKg(65.0)
+                .activityLevel("SEDENTARY")
+                .gender("Khác")
+                .build());
+
+        // Auto-create default preferences
+        userPreferenceRepository.save(UserPreference.builder()
+                .user(savedUser)
+                .language("vi")
+                .timeFormat("24h")
+                .weekStartDay("MONDAY")
+                .scheduleReminderEnabled(true)
+                .scheduleReminderMinutes(15)
+                .mealReminderEnabled(true)
+                .build());
+
         String token = tokenProvider.generateToken(savedUser.getEmail());
 
         return AuthResponse.builder()
