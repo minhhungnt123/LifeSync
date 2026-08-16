@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
+import { notificationApi } from '../api/notificationApi';
 import {
   User as UserIcon,
   Settings,
@@ -30,7 +32,7 @@ const AccountMenuItem: React.FC<AccountMenuItemProps> = ({
       type="button"
       role="menuitem"
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all text-left group ${
+      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all text-left group cursor-pointer ${
         isDestructive
           ? 'text-rose-600 hover:bg-rose-50 hover:text-rose-700'
           : 'text-slate-700 hover:bg-indigo-50/70 hover:text-indigo-600'
@@ -42,7 +44,7 @@ const AccountMenuItem: React.FC<AccountMenuItemProps> = ({
         }`}
       />
       <span className="flex-1 truncate">{label}</span>
-      {badge && (
+      {badge !== undefined && badge !== 0 && (
         <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-600 shrink-0">
           {badge}
         </span>
@@ -56,6 +58,16 @@ export const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const { data: unreadData } = useQuery({
+    queryKey: ['unreadNotificationsCount'],
+    queryFn: async () => {
+      const res = await notificationApi.getUnreadCount();
+      return res.data;
+    },
+  });
+
+  const unreadCount = unreadData?.unreadCount ?? 0;
 
   const togglePopover = () => setIsOpen((prev) => !prev);
 
@@ -158,7 +170,7 @@ export const UserProfile: React.FC = () => {
           <AccountMenuItem
             icon={Bell}
             label="Thông báo"
-            badge="2"
+            badge={unreadCount > 0 ? unreadCount : undefined}
             onClick={() => handleNavigate('/notifications')}
           />
         </div>
