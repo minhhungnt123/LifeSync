@@ -11,7 +11,7 @@
 | **M1** | Project Setup & Architecture Foundation | Khởi tạo cấu trúc dự án Full-stack, thiết lập DB, hệ thống Base Entity & UI Design System | `main` | 1 Tuần | ✅ Hoàn thành |
 | **M2** | Authentication & User Management | Xây dựng cơ chế xác thực JWT, Đăng ký / Đăng nhập, bảo mật API và Quản lý User Profile | `main` | 1 Tuần | ✅ Hoàn thành |
 | **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | `minhhungnt123/feat/time-schedule-management` | 1.5 Tuần | ✅ Hoàn thành |
-| **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ⏳ Chờ thực hiện |
+| **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ✅ Hoàn thành |
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ⏳ Chờ thực hiện |
 | **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
 | **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | `minhhungnt123/feat/m7-system-polish-deployment` | 1 Tuần | ⏳ Chờ thực hiện |
@@ -86,16 +86,16 @@
 > **Nhánh Git (Branch)**: `minhhungnt123/feat/m4-meal-management`
 
 #### Backend
-- [ ] `TASK-401`: Thiết kế Entity `MealLog` (`id`, `userId`, `mealType`, `foodName`, `calories`, `protein`, `carbs`, `fat`, `loggedAt`).
-- [ ] `TASK-402`: Viết `MealService` tính tổng chỉ số dinh dưỡng (Total Calories/Macros) theo ngày.
-- [ ] `TASK-403`: Xây dựng `MealController` (`/api/v1/meals`).
-- [ ] `TASK-404`: Tạo DTOs (`MealLogRequest`, `MealLogResponse`, `DailyNutritionSummaryResponse`).
+- [x] `TASK-401`: Thiết kế Entity `MealLog` (`id`, `userId`, `mealType`, `foodName`, `calories`, `protein`, `carbs`, `fat`, `loggedAt`).
+- [x] `TASK-402`: Viết `MealService` tính tổng chỉ số dinh dưỡng (Total Calories/Macros) theo ngày.
+- [x] `TASK-403`: Xây dựng `MealController` (`/api/v1/meals`).
+- [x] `TASK-404`: Tạo DTOs (`MealLogRequest`, `MealLogResponse`, `DailyNutritionSummaryResponse`).
 
 #### Frontend
-- [ ] `TASK-405`: Thiết kế trang Quản lý Bữa ăn (Meal Management Dashboard).
-- [ ] `TASK-406`: Dựng danh sách thẻ bữa ăn trong ngày (Sáng, Trưa, Tối, Bữa phụ).
-- [ ] `TASK-407`: Tạo Form thêm món ăn / nhật ký dinh dưỡng.
-- [ ] `TASK-408`: Dựng thanh tiến trình (Progress Bar) tổng Calories & Macros đã tiêu thụ trong ngày so với mục tiêu.
+- [x] `TASK-405`: Thiết kế trang Quản lý Bữa ăn (Meal Management Dashboard).
+- [x] `TASK-406`: Dựng danh sách thẻ bữa ăn trong ngày (Sáng, Trưa, Tối, Bữa phụ).
+- [x] `TASK-407`: Tạo Form thêm món ăn / nhật ký dinh dưỡng.
+- [x] `TASK-408`: Dựng thanh tiến trình (Progress Bar) tổng Calories & Macros đã tiêu thụ trong ngày so với mục tiêu.
 
 ---
 

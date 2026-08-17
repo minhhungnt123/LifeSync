@@ -7,6 +7,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
 import { SchedulePage } from './pages/SchedulePage';
+import { MealPage } from './pages/MealPage';
 import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
@@ -33,7 +34,7 @@ export default function App() {
               <Route element={<Layout />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/schedule" element={<SchedulePage />} />
-                <Route path="/meals" element={<div className="text-slate-700">Trang Nhật ký bữa ăn (Milestone 4)</div>} />
+                <Route path="/meals" element={<MealPage />} />
                 <Route path="/ai-assistant" element={<div className="text-slate-700">Trợ lý AI (Milestone 6)</div>} />
               </Route>
             </Route>
