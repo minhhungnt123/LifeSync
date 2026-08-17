@@ -8,6 +8,8 @@ import com.lifesync.entity.Role;
 import com.lifesync.entity.User;
 import com.lifesync.exception.BadRequestException;
 import com.lifesync.exception.ResourceNotFoundException;
+import com.lifesync.repository.UserProfileRepository;
+import com.lifesync.repository.UserPreferenceRepository;
 import com.lifesync.repository.UserRepository;
 import com.lifesync.security.JwtTokenProvider;
 import com.lifesync.service.impl.AuthServiceImpl;
@@ -37,6 +39,12 @@ class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserProfileRepository userProfileRepository;
+
+    @Mock
+    private UserPreferenceRepository userPreferenceRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;

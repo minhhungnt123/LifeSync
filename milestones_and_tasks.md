@@ -11,6 +11,7 @@
 | **M1** | Project Setup & Architecture Foundation | Khởi tạo cấu trúc dự án Full-stack, thiết lập DB, hệ thống Base Entity & UI Design System | `main` | 1 Tuần | ✅ Hoàn thành |
 | **M2** | Authentication & User Management | Xây dựng cơ chế xác thực JWT, Đăng ký / Đăng nhập, bảo mật API và Quản lý User Profile | `main` | 1 Tuần | ✅ Hoàn thành |
 | **M3** | Time & Schedule Management | Mô hình hóa Lịch trình (Schedule CRUD), tích hợp FullCalendar giao diện trực quan | `minhhungnt123/feat/time-schedule-management` | 1.5 Tuần | ✅ Hoàn thành |
+| **M3.5** | User Profile, Settings & Notifications | Quản lý thông tin cá nhân, chỉ số thể chất (BMI/TDEE), cài đặt tài khoản & trung tâm thông báo | `minhhungnt123/feat/m3.5-user-profile-settings` | 1 Tuần | ✅ Hoàn thành |
 | **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ✅ Hoàn thành |
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ⏳ Chờ thực hiện |
 | **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
@@ -77,6 +78,25 @@
 - [x] `TASK-308`: Xây dựng Modal Form thêm/sửa Sự kiện (Create/Edit Schedule Modal) với TimePicker & Category Selector.
 - [x] `TASK-309`: Thêm tính năng Kéo-thả (Drag & Drop) hoặc Đổi kích thước (Resize) để cập nhật thời gian sự kiện trên Calendar.
 - [x] `TASK-310`: Xây dựng bộ lọc lịch trình theo Phân loại (Category Filter: Work, Study, Health, Personal).
+
+---
+
+### 👤 Milestone 3.5: User Profile, Account Settings & Notifications
+
+> **Mục tiêu**: Hoàn thiện các trang tính năng từ Account Popover Menu bao gồm Hồ sơ cá nhân, Cài đặt tài khoản và Trung tâm thông báo.
+> **Nhánh Git (Branch)**: `minhhungnt123/feat/m3.5-user-profile-settings`
+
+#### Backend (Spring Boot 3 + Java 21)
+- [x] `TASK-351`: Thiết kế Entity `UserProfile`, `UserPreference` và `Notification`.
+- [x] `TASK-352`: Viết `UserService` xử lý cập nhật thông tin cá nhân, chỉ số thể chất (BMI/TDEE) và đổi mật khẩu.
+- [x] `TASK-353`: Triển khai `NotificationService` & `NotificationController` (`/api/v1/notifications`).
+- [x] `TASK-354`: Xây dựng API xuất dữ liệu cá nhân (`/api/v1/users/export-data`).
+
+#### Frontend (React + Vite + TypeScript)
+- [x] `TASK-355`: Dựng trang Hồ sơ cá nhân (`ProfilePage.tsx`) với Form cập nhật thông tin & Thống kê chỉ số thể chất BMI.
+- [x] `TASK-356`: Dựng trang Cài đặt tài khoản (`SettingsPage.tsx`) hỗ trợ đổi mật khẩu, tùy chỉnh giao diện & quyền riêng tư.
+- [x] `TASK-357`: Dựng trang Trung tâm thông báo (`NotificationsPage.tsx`) hỗ trợ bộ lọc & đánh dấu đã đọc.
+- [x] `TASK-358`: Kết nối điều hướng từ Account Popover Menu sang 3 trang mới (`/profile`, `/settings`, `/notifications`).
 
 ---
 
