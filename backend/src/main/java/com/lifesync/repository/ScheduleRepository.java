@@ -32,5 +32,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
                                            @Param("startTime") LocalDateTime startTime,
                                            @Param("endTime") LocalDateTime endTime,
                                            @Param("excludeId") Long excludeId);
+
+    List<Schedule> findByUserIdAndStartTimeBetweenOrderByStartTimeAsc(Long userId, LocalDateTime start, LocalDateTime end);
 }
 
