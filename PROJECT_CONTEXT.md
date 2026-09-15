@@ -36,7 +36,8 @@ Build an AI-first personal productivity platform that manages schedules, meals, 
 - PostgreSQL
 
 ### AI
-- OpenAI API (initial)
+- Google Gemini API (Multimodal Vision & Chat - Gemini 1.5/2.0 Flash)
+- OpenAI API (Alternative / Fallback)
 - RAG + LangChain4j (future)
 
 ## Architecture

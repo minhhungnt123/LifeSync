@@ -14,7 +14,7 @@
 | **M3.5** | User Profile, Settings & Notifications | Quản lý thông tin cá nhân, chỉ số thể chất (BMI/TDEE), cài đặt tài khoản & trung tâm thông báo | `minhhungnt123/feat/m3.5-user-profile-settings` | 1 Tuần | ✅ Hoàn thành |
 | **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ✅ Hoàn thành |
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ✅ Hoàn thành |
-| **M6** | AI Assistant Core Integration | Tích hợp OpenAI API, xây dựng Context Builder từ dữ liệu người dùng và giao diện Chatbot | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
+| **M6** | AI Vision & Heartcare Assistant Integration | Tích hợp Google Gemini Multimodal API quét món ăn và Trợ lý AI chăm sóc tim mạch & lối sống | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
 | **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | `minhhungnt123/feat/m7-system-polish-deployment` | 1 Tuần | ⏳ Chờ thực hiện |
 
 ---
@@ -137,23 +137,25 @@
 
 ---
 
-### 🤖 Milestone 6: AI Assistant Core Integration
+### 🤖 Milestone 6: AI Vision & Heartcare Assistant Integration
 
-> **Mục tiêu**: Tích hợp Trợ lý AI trả lời dựa trên dữ liệu lịch trình và bữa ăn thực tế của người dùng.
+> **Mục tiêu**: Tích hợp Google Gemini Multimodal API để quét/ước tính dinh dưỡng từ ảnh bữa ăn (Food Vision Scanner) và Trợ lý AI đồng hành chăm sóc sức khỏe tim mạch & lối sống (Heartcare & Lifestyle Companion) dựa trên dữ liệu cá nhân.
 > **Nhánh Git (Branch)**: `minhhungnt123/feat/m6-ai-assistant`
 
-#### Backend
-- [ ] `TASK-601`: Cấu hình OpenAI Client (OpenAI Java SDK hoặc REST Template / WebClient).
-- [ ] `TASK-602`: Xây dựng `UserDataContextBuilderService`: Tổng hợp dữ liệu Schedule và MealLog gần đây của User thành Prompt Context.
-- [ ] `TASK-603`: Xây dựng Prompt System Template hướng dẫn AI (Quy định: Không tự bịa dữ liệu, phân tích năng suất & thói quen ăn uống, đưa ra gợi ý cải thiện).
-- [ ] `TASK-604`: Triển khai `AiAssistantService` và `AiController` (`/api/v1/ai/chat`) hỗ trợ nhận câu hỏi và trả về câu trả lời.
-- [ ] `TASK-605`: Thêm cơ chế giới hạn truy cập (Rate Limiting) hoặc caching cho câu hỏi phổ biến.
+#### Backend (Spring Boot 3 + Java 21)
+- [ ] `TASK-601`: Cấu hình Gemini AI Client (`GeminiApiClient` tích hợp Google Gemini API qua Spring RestClient, hỗ trợ Multimodal Vision và Structured JSON Output).
+- [ ] `TASK-602`: Triển khai `FoodScanService` & DTOs (`FoodScanResponse` gồm `foodName`, `portion`, `calories`, `macros`, `heartHealthTip`): Nhận diện ảnh và ước tính calo/dinh dưỡng từ Gemini Flash.
+- [ ] `TASK-603`: Xây dựng `HeartCareContextBuilderService`: Tổng hợp thông tin hồ sơ sức khỏe (`UserProfile`: BMI, TDEE), lịch sử ăn uống (`MealLog`) và áp lực lịch trình (`Schedule`) thành AI Prompt Context.
+- [ ] `TASK-604`: Thiết lập Heartcare System Prompt Template (Nguyên tắc lối sống phòng ngừa, dinh dưỡng thân thiện tim mạch DASH/Mediterranean, giảm stress, kèm Medical Disclaimer chuẩn mực).
+- [ ] `TASK-605`: Triển khai `AiAssistantService` và `AiController` (`POST /api/v1/ai/scan-food`, `POST /api/v1/ai/chat`, `GET /api/v1/ai/suggested-prompts`).
+- [ ] `TASK-606`: Xử lý ngoại lệ AI, Validation ảnh tải lên và cơ chế Rate Limiting / Fallback khi kết nối mô hình.
 
-#### Frontend
-- [ ] `TASK-606`: Xây dựng UI Chatbot Widget (Floating Chat Window & Full-page AI Chat View).
-- [ ] `TASK-607`: Xử lý giao diện hiển thị câu trả lời với Markdown Renderer & Code Highlighting.
-- [ ] `TASK-608`: Thêm bộ gợi ý câu hỏi mẫu (Prompt Chips / Quick Suggestions e.g., "Tóm tắt lịch làm việc tuần này", "Gợi ý cải thiện chế độ ăn").
-- [ ] `TASK-609`: Xử lý hiệu ứng Loading / Typing Animation khi AI đang suy nghĩ.
+#### Frontend (React + Vite + TypeScript)
+- [ ] `TASK-607`: Xây dựng `FoodScanModal` & Tích hợp nút quét ảnh món ăn tại `MealPage.tsx` (Chụp ảnh/Upload, xem trước ảnh, xử lý nén client-side).
+- [ ] `TASK-608`: Giao diện Xác nhận & Hiệu chỉnh kết quả quét món ăn (Human-in-the-loop review trước khi bấm lưu vào nhật ký `MealLog`).
+- [ ] `TASK-609`: Xây dựng giao diện Heartcare Chatbot (Floating Chat Widget góc phải màn hình và View Chat toàn trang).
+- [ ] `TASK-610`: Tích hợp Markdown Renderer, hiển thị chỉ số sức khỏe trực quan và hiệu ứng Typing / Thinking Animation.
+- [ ] `TASK-611`: Xây dựng bộ thẻ câu hỏi nhanh (Heartcare Prompt Chips: "Đánh giá thực đơn hôm nay cho tim mạch", "Gợi ý bữa phụ ít muối", "Lịch làm việc có gây quá tải không?").
 
 ---
 
