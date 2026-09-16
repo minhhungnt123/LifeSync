@@ -34,6 +34,8 @@ class GeminiAiClientTest {
         geminiProperties.setApiKey("test-gemini-api-key");
         geminiProperties.setModel("gemini-1.5-flash");
         geminiProperties.setBaseUrl("https://generativelanguage.googleapis.com/v1beta");
+        geminiProperties.setMaxRetries(0);
+        geminiProperties.setFallbackModel(null);
 
         RestClient.Builder builder = RestClient.builder();
         mockServer = MockRestServiceServer.bindTo(builder).build();
@@ -136,6 +138,79 @@ class GeminiAiClientTest {
         assertThatThrownBy(() -> geminiAiClient.generateText(null, "Hello"))
                 .isInstanceOf(AiServiceException.class)
                 .hasMessageContaining("Hạn mức gọi Gemini API đã vượt quá giới hạn");
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("generateText: Thử lại thành công sau khi gặp lỗi tạm thời 503")
+    void generateText_RetriesOnTransientError_Success() {
+        geminiProperties.setMaxRetries(1);
+
+        String expectedResponseJson = """
+                {
+                  "candidates": [
+                    {
+                      "content": {
+                        "parts": [{ "text": "Phản hồi sau khi retry!" }],
+                        "role": "model"
+                      },
+                      "finishReason": "STOP",
+                      "index": 0
+                    }
+                  ]
+                }
+                """;
+
+        // First attempt fails with 503
+        mockServer.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-gemini-api-key"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE));
+
+        // Second attempt succeeds
+        mockServer.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-gemini-api-key"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(expectedResponseJson, MediaType.APPLICATION_JSON));
+
+        String result = geminiAiClient.generateText(null, "Test prompt");
+
+        assertThat(result).isEqualTo("Phản hồi sau khi retry!");
+        mockServer.verify();
+    }
+
+    @Test
+    @DisplayName("generateText: Tự động chuyển sang fallback model khi primary model gặp lỗi server 503")
+    void generateText_SwitchesToFallbackModel_WhenServerError() {
+        geminiProperties.setMaxRetries(0);
+        geminiProperties.setFallbackModel("gemini-2.5-flash");
+
+        String expectedFallbackResponse = """
+                {
+                  "candidates": [
+                    {
+                      "content": {
+                        "parts": [{ "text": "Phản hồi từ fallback model!" }],
+                        "role": "model"
+                      },
+                      "finishReason": "STOP",
+                      "index": 0
+                    }
+                  ]
+                }
+                """;
+
+        // Primary model fails with 503
+        mockServer.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=test-gemini-api-key"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE));
+
+        // Fallback model succeeds
+        mockServer.expect(requestTo("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=test-gemini-api-key"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(expectedFallbackResponse, MediaType.APPLICATION_JSON));
+
+        String result = geminiAiClient.generateText(null, "Test prompt");
+
+        assertThat(result).isEqualTo("Phản hồi từ fallback model!");
         mockServer.verify();
     }
 }

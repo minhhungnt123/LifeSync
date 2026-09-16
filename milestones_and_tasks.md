@@ -148,7 +148,7 @@
 - [x] `TASK-603`: Xây dựng `HeartCareContextBuilderService`: Tổng hợp thông tin hồ sơ sức khỏe (`UserProfile`: BMI, TDEE), lịch sử ăn uống (`MealLog`) và áp lực lịch trình (`Schedule`) thành AI Prompt Context.
 - [x] `TASK-604`: Thiết lập Heartcare System Prompt Template (Nguyên tắc lối sống phòng ngừa, dinh dưỡng thân thiện tim mạch DASH/Mediterranean, giảm stress, kèm Medical Disclaimer chuẩn mực).
 - [x] `TASK-605`: Triển khai `AiAssistantService` và `AiController` (`POST /api/v1/ai/scan-food`, `POST /api/v1/ai/chat`, `GET /api/v1/ai/suggested-prompts`).
-- [ ] `TASK-606`: Xử lý ngoại lệ AI, Validation ảnh tải lên và cơ chế Rate Limiting / Fallback khi kết nối mô hình.
+- [x] `TASK-606`: Xử lý ngoại lệ AI, Validation ảnh tải lên và cơ chế Rate Limiting / Fallback khi kết nối mô hình.
 
 #### Frontend (React + Vite + TypeScript)
 - [ ] `TASK-607`: Xây dựng `FoodScanModal` & Tích hợp nút quét ảnh món ăn tại `MealPage.tsx` (Chụp ảnh/Upload, xem trước ảnh, xử lý nén client-side).
