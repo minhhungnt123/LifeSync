@@ -38,6 +38,9 @@ class AiAssistantServiceTest {
     @Mock
     private FoodScanService foodScanService;
 
+    @Mock
+    private AiRateLimiterService aiRateLimiterService;
+
     private AiAssistantService aiAssistantService;
 
     @BeforeEach
@@ -46,7 +49,8 @@ class AiAssistantServiceTest {
                 heartCareContextBuilderService,
                 heartcarePromptTemplate,
                 geminiAiClient,
-                foodScanService
+                foodScanService,
+                aiRateLimiterService
         );
     }
 
@@ -75,9 +79,49 @@ class AiAssistantServiceTest {
         assertThat(response.getDisclaimer()).contains("LƯU Ý Y TẾ QUAN TRỌNG");
         assertThat(response.getTimestamp()).isNotNull();
 
+        verify(aiRateLimiterService).checkRateLimit(userEmail);
         verify(heartCareContextBuilderService).buildFormattedPromptContext(userEmail);
         verify(heartcarePromptTemplate).buildPromptWithContext(request.getMessage(), mockContext);
         verify(geminiAiClient).generateText(mockSystemInstruction, mockCompositePrompt);
+    }
+
+    @Test
+    @DisplayName("chat: Trả về fallback an toàn khi kết nối AI bị lỗi 502/503/timeout")
+    void chat_Fallback_WhenAiServiceFails() {
+        // Given
+        String userEmail = "test@lifesync.com";
+        AiChatRequest request = new AiChatRequest("Tư vấn tim mạch");
+        String mockContext = "Context";
+        String mockPrompt = "Prompt";
+
+        when(heartCareContextBuilderService.buildFormattedPromptContext(userEmail)).thenReturn(mockContext);
+        when(heartcarePromptTemplate.buildPromptWithContext(any(), any())).thenReturn(mockPrompt);
+        when(heartcarePromptTemplate.getSystemInstruction()).thenReturn("System instruction");
+        when(geminiAiClient.generateText(any(), any()))
+                .thenThrow(new com.lifesync.exception.AiServiceException("Máy chủ AI gián đoạn", org.springframework.http.HttpStatus.BAD_GATEWAY));
+
+        // When
+        AiChatResponse response = aiAssistantService.chat(userEmail, request);
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getReply()).contains("Thông báo kết nối AI");
+        assertThat(response.getReply()).contains("Dinh dưỡng");
+        assertThat(response.getDisclaimer()).contains("LƯU Ý Y TẾ QUAN TRỌNG");
+    }
+
+    @Test
+    @DisplayName("chat: Ném ngoại lệ khi người dùng bị vượt quá rate limit 429")
+    void chat_ThrowsException_WhenRateLimitExceeded() {
+        String userEmail = "spammer@lifesync.com";
+        AiChatRequest request = new AiChatRequest("Hello AI");
+
+        org.mockito.Mockito.doThrow(new com.lifesync.exception.AiServiceException("Quá nhiều yêu cầu", org.springframework.http.HttpStatus.TOO_MANY_REQUESTS))
+                .when(aiRateLimiterService).checkRateLimit(userEmail);
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> aiAssistantService.chat(userEmail, request))
+                .isInstanceOf(com.lifesync.exception.AiServiceException.class)
+                .hasMessageContaining("Quá nhiều yêu cầu");
     }
 
     @Test

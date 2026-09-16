@@ -32,6 +32,14 @@ class FoodScanServiceTest {
         foodScanService = new FoodScanServiceImpl(geminiAiClient);
     }
 
+    private byte[] createValidJpegBytes(int size) {
+        byte[] bytes = new byte[Math.max(120, size)];
+        bytes[0] = (byte) 0xFF;
+        bytes[1] = (byte) 0xD8;
+        bytes[2] = (byte) 0xFF;
+        return bytes;
+    }
+
     @Test
     @DisplayName("scanFoodImage: Quét và bóc tách thành công thông tin món ăn từ ảnh")
     void scanFoodImage_Success() {
@@ -40,7 +48,7 @@ class FoodScanServiceTest {
                 "file",
                 "pho_bo.jpg",
                 "image/jpeg",
-                "sample-image-binary-content".getBytes()
+                createValidJpegBytes(200)
         );
 
         FoodScanResponse mockAiResponse = FoodScanResponse.builder()
@@ -87,13 +95,34 @@ class FoodScanServiceTest {
     }
 
     @Test
+    @DisplayName("scanFoodImage: Ném BadRequestException khi tệp quá nhỏ (< 100 bytes)")
+    void scanFoodImage_ThrowsBadRequest_WhenFileTooSmall() {
+        MockMultipartFile tinyFile = new MockMultipartFile("file", "tiny.jpg", "image/jpeg", new byte[50]);
+
+        assertThatThrownBy(() -> foodScanService.scanFoodImage(tinyFile))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("quá nhỏ");
+    }
+
+    @Test
+    @DisplayName("scanFoodImage: Ném BadRequestException khi chữ ký tệp giả mạo không phải ảnh")
+    void scanFoodImage_ThrowsBadRequest_WhenMagicBytesInvalid() {
+        byte[] fakeBytes = new byte[200]; // no jpeg/png magic bytes
+        MockMultipartFile fakeFile = new MockMultipartFile("file", "fake.jpg", "image/jpeg", fakeBytes);
+
+        assertThatThrownBy(() -> foodScanService.scanFoodImage(fakeFile))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("chữ ký tệp không khớp");
+    }
+
+    @Test
     @DisplayName("scanFoodImage: Ném BadRequestException khi định dạng file không được hỗ trợ (ví dụ PDF)")
     void scanFoodImage_ThrowsBadRequest_WhenUnsupportedMimeType() {
         MockMultipartFile pdfFile = new MockMultipartFile(
                 "file",
                 "document.pdf",
                 "application/pdf",
-                "fake-pdf-content".getBytes()
+                new byte[200]
         );
 
         assertThatThrownBy(() -> foodScanService.scanFoodImage(pdfFile))
@@ -108,7 +137,7 @@ class FoodScanServiceTest {
                 "file",
                 "car.jpg",
                 "image/jpeg",
-                "car-image-bytes".getBytes()
+                createValidJpegBytes(200)
         );
 
         FoodScanResponse notFoodResponse = FoodScanResponse.builder()

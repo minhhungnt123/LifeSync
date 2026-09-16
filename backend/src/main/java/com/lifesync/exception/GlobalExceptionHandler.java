@@ -80,9 +80,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AiServiceException.class)
     public ResponseEntity<ApiResponse<Void>> handleAiServiceException(AiServiceException ex) {
-        log.error("AiServiceException: {}", ex.getMessage(), ex);
+        log.error("AiServiceException [Status {}]: {}", ex.getStatus(), ex.getMessage());
         return ResponseEntity.status(ex.getStatus())
                 .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeExceeded(org.springframework.web.multipart.MaxUploadSizeExceededException ex) {
+        log.warn("MaxUploadSizeExceededException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Dung lượng tệp tải lên vượt quá giới hạn cho phép (tối đa 10MB)!"));
     }
 
     @ExceptionHandler(Exception.class)

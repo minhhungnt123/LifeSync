@@ -153,15 +153,67 @@ public class GeminiAiClientImpl implements GeminiAiClient {
     }
 
     private GeminiResponse executeCall(GeminiRequest request) {
+        int maxRetries = Math.max(0, geminiProperties.getMaxRetries());
+        int attempt = 0;
+        long backoffMillis = 500L;
+
+        while (true) {
+            try {
+                return executeSingleCall(request, geminiProperties.getModel());
+            } catch (AiServiceException ex) {
+                boolean isTransient = ex.getStatus() == HttpStatus.TOO_MANY_REQUESTS
+                        || ex.getStatus() == HttpStatus.GATEWAY_TIMEOUT
+                        || ex.getStatus() == HttpStatus.BAD_GATEWAY
+                        || ex.getStatus() == HttpStatus.SERVICE_UNAVAILABLE;
+
+                if (isTransient && attempt < maxRetries) {
+                    attempt++;
+                    log.warn("Gemini API call failed with status {} on attempt {}/{}. Retrying in {}ms...",
+                            ex.getStatus(), attempt, maxRetries, backoffMillis);
+                    try {
+                        Thread.sleep(backoffMillis);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw ex;
+                    }
+                    backoffMillis *= 2;
+                    continue;
+                }
+
+                // Attempt fallback model for server outages or unavailable model (not on quota 429)
+                boolean canFallback = (ex.getStatus() == HttpStatus.SERVICE_UNAVAILABLE
+                        || ex.getStatus() == HttpStatus.BAD_GATEWAY
+                        || ex.getStatus() == HttpStatus.GATEWAY_TIMEOUT
+                        || ex.getStatus() == HttpStatus.NOT_FOUND);
+
+                if (canFallback && geminiProperties.getFallbackModel() != null
+                        && !geminiProperties.getFallbackModel().isBlank()
+                        && !geminiProperties.getFallbackModel().equalsIgnoreCase(geminiProperties.getModel())) {
+                    log.warn("Attempting fallback to model '{}' after error: {}",
+                            geminiProperties.getFallbackModel(), ex.getMessage());
+                    try {
+                        return executeSingleCall(request, geminiProperties.getFallbackModel());
+                    } catch (Exception fallbackEx) {
+                        log.error("Fallback model '{}' also failed: {}",
+                                geminiProperties.getFallbackModel(), fallbackEx.getMessage());
+                    }
+                }
+
+                throw ex;
+            }
+        }
+    }
+
+    private GeminiResponse executeSingleCall(GeminiRequest request, String model) {
         String url = String.format(
                 "%s/models/%s:generateContent?key=%s",
                 geminiProperties.getBaseUrl(),
-                geminiProperties.getModel(),
+                model,
                 geminiProperties.getApiKey()
         );
 
         try {
-            log.debug("Sending request to Gemini API (Model: {})", geminiProperties.getModel());
+            log.debug("Sending request to Gemini API (Model: {})", model);
             GeminiResponse response = restClient.post()
                     .uri(url)
                     .body(request)
