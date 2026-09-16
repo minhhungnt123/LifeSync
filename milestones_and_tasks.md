@@ -145,7 +145,7 @@
 #### Backend (Spring Boot 3 + Java 21)
 - [x] `TASK-601`: Cấu hình Gemini AI Client (`GeminiApiClient` tích hợp Google Gemini API qua Spring RestClient, hỗ trợ Multimodal Vision và Structured JSON Output).
 - [x] `TASK-602`: Triển khai `FoodScanService` & DTOs (`FoodScanResponse` gồm `foodName`, `portion`, `calories`, `macros`, `heartHealthTip`): Nhận diện ảnh và ước tính calo/dinh dưỡng từ Gemini Flash.
-- [ ] `TASK-603`: Xây dựng `HeartCareContextBuilderService`: Tổng hợp thông tin hồ sơ sức khỏe (`UserProfile`: BMI, TDEE), lịch sử ăn uống (`MealLog`) và áp lực lịch trình (`Schedule`) thành AI Prompt Context.
+- [x] `TASK-603`: Xây dựng `HeartCareContextBuilderService`: Tổng hợp thông tin hồ sơ sức khỏe (`UserProfile`: BMI, TDEE), lịch sử ăn uống (`MealLog`) và áp lực lịch trình (`Schedule`) thành AI Prompt Context.
 - [ ] `TASK-604`: Thiết lập Heartcare System Prompt Template (Nguyên tắc lối sống phòng ngừa, dinh dưỡng thân thiện tim mạch DASH/Mediterranean, giảm stress, kèm Medical Disclaimer chuẩn mực).
 - [ ] `TASK-605`: Triển khai `AiAssistantService` và `AiController` (`POST /api/v1/ai/scan-food`, `POST /api/v1/ai/chat`, `GET /api/v1/ai/suggested-prompts`).
 - [ ] `TASK-606`: Xử lý ngoại lệ AI, Validation ảnh tải lên và cơ chế Rate Limiting / Fallback khi kết nối mô hình.
