@@ -20,9 +20,9 @@ public class GeminiProperties {
     private String apiKey;
 
     /**
-     * Default model identifier (e.g., gemini-1.5-flash, gemini-2.0-flash).
+     * Default model identifier (e.g., gemini-3.6-flash, gemini-2.5-flash-lite).
      */
-    private String model = "gemini-1.5-flash";
+    private String model = "gemini-3.6-flash";
 
     /**
      * Base URL for Google Generative Language API.
