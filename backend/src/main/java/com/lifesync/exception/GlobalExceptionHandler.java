@@ -78,6 +78,13 @@ public class GlobalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(AiServiceException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAiServiceException(AiServiceException ex) {
+        log.error("AiServiceException: {}", ex.getMessage(), ex);
+        return ResponseEntity.status(ex.getStatus())
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
         log.error("Unhandled Exception caught in GlobalExceptionHandler: ", ex);
