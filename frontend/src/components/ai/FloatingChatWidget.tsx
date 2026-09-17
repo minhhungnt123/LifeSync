@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAiChat } from '../../hooks/useAiChat';
 import { ChatMessageItem } from './ChatMessageItem';
+import { TypingThinkingIndicator } from './TypingThinkingIndicator';
 
 const QUICK_PROMPTS = [
   'Đánh giá thực đơn hôm nay cho tim mạch?',
@@ -115,12 +116,7 @@ export const FloatingChatWidget: React.FC = () => {
             ))}
 
             {/* AI Typing / Thinking Indicator */}
-            {isSending && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-white rounded-2xl border border-slate-200/80 w-fit text-slate-500 text-xs shadow-2xs animate-pulse">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
-                <span className="font-medium text-[11.5px]">LifeSync AI đang phân tích dữ liệu...</span>
-              </div>
-            )}
+            {isSending && <TypingThinkingIndicator />}
 
             <div ref={messagesEndRef} />
           </div>

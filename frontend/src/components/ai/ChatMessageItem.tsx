@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bot, User, Copy, Check, ShieldAlert } from 'lucide-react';
 import type { AiChatMessage } from '../../types/ai';
+import { MarkdownRenderer } from './MarkdownRenderer';
 
 interface ChatMessageItemProps {
   message: AiChatMessage;
@@ -78,7 +79,11 @@ export const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message }) => 
               : 'bg-white text-slate-800 border border-slate-200/80 rounded-tl-xs'
           }`}
         >
-          <div className="whitespace-pre-line">{message.content}</div>
+          {isUser ? (
+            <div className="whitespace-pre-line">{message.content}</div>
+          ) : (
+            <MarkdownRenderer content={message.content} />
+          )}
 
           {/* Medical Disclaimer Banner */}
           {message.disclaimer && (

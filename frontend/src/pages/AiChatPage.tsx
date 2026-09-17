@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useAiChat } from '../hooks/useAiChat';
 import { ChatMessageItem } from '../components/ai/ChatMessageItem';
+import { TypingThinkingIndicator } from '../components/ai/TypingThinkingIndicator';
 import { aiApi } from '../api/aiApi';
 
 const DEFAULT_CHIPS = [
@@ -192,12 +193,7 @@ export const AiChatPage: React.FC = () => {
           ))}
 
           {/* AI Thinking Animation */}
-          {isSending && (
-            <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-2xl border border-slate-200 w-fit text-slate-600 text-xs shadow-2xs animate-pulse">
-              <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-              <span className="font-semibold">LifeSync AI đang suy luận dựa trên dữ liệu sức khỏe của bạn...</span>
-            </div>
-          )}
+          {isSending && <TypingThinkingIndicator />}
 
           <div ref={messagesEndRef} />
         </div>

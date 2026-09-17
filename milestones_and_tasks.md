@@ -154,7 +154,7 @@
 - [x] `TASK-607`: Xây dựng `FoodScanModal` & Tích hợp nút quét ảnh món ăn tại `MealPage.tsx` (Chụp ảnh/Upload, xem trước ảnh, xử lý nén client-side).
 - [x] `TASK-608`: Giao diện Xác nhận & Hiệu chỉnh kết quả quét món ăn (Human-in-the-loop review trước khi bấm lưu vào nhật ký `MealLog`).
 - [x] `TASK-609`: Xây dựng giao diện Heartcare Chatbot (Floating Chat Widget góc phải màn hình và View Chat toàn trang).
-- [ ] `TASK-610`: Tích hợp Markdown Renderer, hiển thị chỉ số sức khỏe trực quan và hiệu ứng Typing / Thinking Animation.
+- [x] `TASK-610`: Tích hợp Markdown Renderer, hiển thị chỉ số sức khỏe trực quan và hiệu ứng Typing / Thinking Animation.
 - [ ] `TASK-611`: Xây dựng bộ thẻ câu hỏi nhanh (Heartcare Prompt Chips: "Đánh giá thực đơn hôm nay cho tim mạch", "Gợi ý bữa phụ ít muối", "Lịch làm việc có gây quá tải không?").
 
 ---
