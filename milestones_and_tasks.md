@@ -151,7 +151,7 @@
 - [x] `TASK-606`: Xử lý ngoại lệ AI, Validation ảnh tải lên và cơ chế Rate Limiting / Fallback khi kết nối mô hình.
 
 #### Frontend (React + Vite + TypeScript)
-- [ ] `TASK-607`: Xây dựng `FoodScanModal` & Tích hợp nút quét ảnh món ăn tại `MealPage.tsx` (Chụp ảnh/Upload, xem trước ảnh, xử lý nén client-side).
+- [x] `TASK-607`: Xây dựng `FoodScanModal` & Tích hợp nút quét ảnh món ăn tại `MealPage.tsx` (Chụp ảnh/Upload, xem trước ảnh, xử lý nén client-side).
 - [ ] `TASK-608`: Giao diện Xác nhận & Hiệu chỉnh kết quả quét món ăn (Human-in-the-loop review trước khi bấm lưu vào nhật ký `MealLog`).
 - [ ] `TASK-609`: Xây dựng giao diện Heartcare Chatbot (Floating Chat Widget góc phải màn hình và View Chat toàn trang).
 - [ ] `TASK-610`: Tích hợp Markdown Renderer, hiển thị chỉ số sức khỏe trực quan và hiệu ứng Typing / Thinking Animation.

@@ -7,13 +7,16 @@ import {
   Calendar as CalendarIcon,
   Plus,
   Sparkles,
+  Camera,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { mealApi } from '../api/mealApi';
 import type { MealLog, MealLogRequest, MealType } from '../types/meal';
+import type { FoodScanResponse } from '../types/ai';
 import { MealProgressBar } from '../components/meal/MealProgressBar';
 import { MealCategorySection } from '../components/meal/MealCategorySection';
 import { MealModal } from '../components/meal/MealModal';
+import { FoodScanModal } from '../components/meal/FoodScanModal';
 
 export const MealPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -22,6 +25,8 @@ export const MealPage: React.FC = () => {
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isScanModalOpen, setIsScanModalOpen] = useState(false);
+  const [scannedHeartTip, setScannedHeartTip] = useState<string | null>(null);
   const [editingMeal, setEditingMeal] = useState<MealLog | null>(null);
   const [selectedMealType, setSelectedMealType] = useState<MealType>('BREAKFAST');
 
@@ -99,13 +104,29 @@ export const MealPage: React.FC = () => {
 
   const handleOpenAddModal = (type: MealType = 'BREAKFAST') => {
     setEditingMeal(null);
+    setScannedHeartTip(null);
     setSelectedMealType(type);
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (meal: MealLog) => {
     setEditingMeal(meal);
+    setScannedHeartTip(null);
     setSelectedMealType(meal.mealType);
+    setIsModalOpen(true);
+  };
+
+  const handleScanSuccess = (result: FoodScanResponse) => {
+    setScannedHeartTip(result.heartHealthTip || null);
+    setEditingMeal({
+      foodName: result.foodName || '',
+      calories: Math.round(result.calories || 0),
+      protein: Math.round(result.macros?.protein || 0),
+      carbs: Math.round(result.macros?.carbs || 0),
+      fat: Math.round(result.macros?.fat || 0),
+      mealType: selectedMealType,
+      loggedAt: new Date().toISOString(),
+    } as any);
     setIsModalOpen(true);
   };
 
@@ -116,7 +137,7 @@ export const MealPage: React.FC = () => {
   };
 
   const handleFormSubmit = async (data: MealLogRequest) => {
-    if (editingMeal) {
+    if (editingMeal && editingMeal.id) {
       await updateMutation.mutateAsync({ id: editingMeal.id, data });
     } else {
       await createMutation.mutateAsync(data);
@@ -197,14 +218,24 @@ export const MealPage: React.FC = () => {
 
           <button
             onClick={handleToday}
-            className="px-3.5 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition-colors"
+            className="px-3.5 py-2 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl transition-colors cursor-pointer"
           >
             Hôm nay
           </button>
 
+          {/* AI Food Scanner Button */}
+          <button
+            onClick={() => setIsScanModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 rounded-2xl shadow-md shadow-purple-200 transition-all hover:scale-[1.02] cursor-pointer"
+          >
+            <Camera className="w-4 h-4 text-purple-200" />
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse -ml-1" />
+            <span>AI Quét món ăn</span>
+          </button>
+
           <button
             onClick={() => handleOpenAddModal('BREAKFAST')}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-2xl shadow-md shadow-indigo-200 transition-all hover:scale-[1.02]"
+            className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-2xl shadow-md shadow-indigo-200 transition-all hover:scale-[1.02] cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Ghi nhận bữa ăn</span>
@@ -286,6 +317,14 @@ export const MealPage: React.FC = () => {
         initialData={editingMeal}
         defaultMealType={selectedMealType}
         isLoading={createMutation.isPending || updateMutation.isPending}
+        aiHeartTip={scannedHeartTip}
+      />
+
+      {/* AI Food Scan Modal */}
+      <FoodScanModal
+        isOpen={isScanModalOpen}
+        onClose={() => setIsScanModalOpen(false)}
+        onScanSuccess={handleScanSuccess}
       />
     </div>
   );
