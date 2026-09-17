@@ -13,12 +13,7 @@ import {
 import { useAiChat } from '../../hooks/useAiChat';
 import { ChatMessageItem } from './ChatMessageItem';
 import { TypingThinkingIndicator } from './TypingThinkingIndicator';
-
-const QUICK_PROMPTS = [
-  'Đánh giá thực đơn hôm nay cho tim mạch?',
-  'Gợi ý bữa phụ ít muối chuẩn DASH?',
-  'Lịch làm việc có gây quá tải không?',
-];
+import { HeartcarePromptChips } from './HeartcarePromptChips';
 
 export const FloatingChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,10 +41,6 @@ export const FloatingChatWidget: React.FC = () => {
 
     sendMessage(inputMessage);
     setInputMessage('');
-  };
-
-  const handlePromptClick = (prompt: string) => {
-    sendMessage(prompt);
   };
 
   const handleExpandToFullPage = () => {
@@ -121,19 +112,13 @@ export const FloatingChatWidget: React.FC = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Prompt Chips */}
-          <div className="px-3.5 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {QUICK_PROMPTS.map((prompt, idx) => (
-              <button
-                key={idx}
-                type="button"
-                disabled={isSending}
-                onClick={() => handlePromptClick(prompt)}
-                className="shrink-0 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {prompt}
-              </button>
-            ))}
+          {/* Quick Prompt Chips (Compact Mode) */}
+          <div className="px-3.5 py-2 bg-white border-t border-slate-100">
+            <HeartcarePromptChips
+              onSelectPrompt={sendMessage}
+              disabled={isSending}
+              compact={true}
+            />
           </div>
 
           {/* Input Footer */}

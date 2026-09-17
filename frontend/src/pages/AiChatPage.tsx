@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import {
   Bot,
   Send,
@@ -11,36 +10,17 @@ import {
   Utensils,
   Calendar,
   Moon,
-  Lightbulb,
 } from 'lucide-react';
 import { useAiChat } from '../hooks/useAiChat';
 import { ChatMessageItem } from '../components/ai/ChatMessageItem';
 import { TypingThinkingIndicator } from '../components/ai/TypingThinkingIndicator';
-import { aiApi } from '../api/aiApi';
-
-const DEFAULT_CHIPS = [
-  { id: '1', title: 'Đánh giá bữa ăn', prompt: 'Đánh giá dinh dưỡng và lượng muối của thực đơn hôm nay cho tim mạch của tôi.' },
-  { id: '2', title: 'Gợi ý bữa phụ ít muối', prompt: 'Gợi ý cho tôi 3 món ăn nhẹ/bữa phụ lành mạnh, ít natri theo chuẩn DASH.' },
-  { id: '3', title: 'Kiểm tra quá tải lịch trình', prompt: 'Lịch trình làm việc tuần này của tôi có gây căng thẳng hay quá tải cho tim mạch không?' },
-  { id: '4', title: 'Cải thiện giấc ngủ', prompt: 'Nêu các thói quen buổi tối giúp hạ nhịp tim và cải thiện chất lượng giấc ngủ sâu.' },
-];
+import { HeartcarePromptChips } from '../components/ai/HeartcarePromptChips';
 
 export const AiChatPage: React.FC = () => {
   const { messages, isSending, sendMessage, clearHistory } = useAiChat();
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Fetch suggested prompts from backend
-  const { data: suggestionsResponse } = useQuery({
-    queryKey: ['aiSuggestedPrompts'],
-    queryFn: () => aiApi.getSuggestedPrompts(),
-    staleTime: 1000 * 60 * 10, // 10 mins cache
-  });
-
-  const promptChips = suggestionsResponse?.data && suggestionsResponse.data.length > 0
-    ? suggestionsResponse.data
-    : DEFAULT_CHIPS;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -66,10 +46,6 @@ export const AiChatPage: React.FC = () => {
       e.preventDefault();
       handleSend();
     }
-  };
-
-  const handleChipClick = (prompt: string) => {
-    sendMessage(prompt);
   };
 
   return (
@@ -198,25 +174,12 @@ export const AiChatPage: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Prompt Suggestions Bar */}
-        <div className="px-4 sm:px-6 py-2.5 bg-white border-t border-slate-100">
-          <div className="flex items-center gap-2 mb-1 text-[11px] font-bold text-slate-500">
-            <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-            <span>Gợi ý câu hỏi nhanh:</span>
-          </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            {promptChips.map((chip) => (
-              <button
-                key={chip.id}
-                type="button"
-                disabled={isSending}
-                onClick={() => handleChipClick(chip.prompt)}
-                className="shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
-              >
-                {chip.title}
-              </button>
-            ))}
-          </div>
+        {/* Heartcare Prompt Chips Categories & Suggestions */}
+        <div className="px-4 sm:px-6 py-2.5 bg-white border-t border-slate-100 max-h-48 overflow-y-auto">
+          <HeartcarePromptChips
+            onSelectPrompt={sendMessage}
+            disabled={isSending}
+          />
         </div>
 
         {/* Input Bar */}

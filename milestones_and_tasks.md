@@ -14,7 +14,7 @@
 | **M3.5** | User Profile, Settings & Notifications | Quản lý thông tin cá nhân, chỉ số thể chất (BMI/TDEE), cài đặt tài khoản & trung tâm thông báo | `minhhungnt123/feat/m3.5-user-profile-settings` | 1 Tuần | ✅ Hoàn thành |
 | **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ✅ Hoàn thành |
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ✅ Hoàn thành |
-| **M6** | AI Vision & Heartcare Assistant Integration | Tích hợp Google Gemini Multimodal API quét món ăn và Trợ lý AI chăm sóc tim mạch & lối sống | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
+| **M6** | AI Vision & Heartcare Assistant Integration | Tích hợp Google Gemini Multimodal API quét món ăn và Trợ lý AI chăm sóc tim mạch & lối sống | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ✅ Hoàn thành |
 | **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | `minhhungnt123/feat/m7-system-polish-deployment` | 1 Tuần | ⏳ Chờ thực hiện |
 
 ---
@@ -155,7 +155,7 @@
 - [x] `TASK-608`: Giao diện Xác nhận & Hiệu chỉnh kết quả quét món ăn (Human-in-the-loop review trước khi bấm lưu vào nhật ký `MealLog`).
 - [x] `TASK-609`: Xây dựng giao diện Heartcare Chatbot (Floating Chat Widget góc phải màn hình và View Chat toàn trang).
 - [x] `TASK-610`: Tích hợp Markdown Renderer, hiển thị chỉ số sức khỏe trực quan và hiệu ứng Typing / Thinking Animation.
-- [ ] `TASK-611`: Xây dựng bộ thẻ câu hỏi nhanh (Heartcare Prompt Chips: "Đánh giá thực đơn hôm nay cho tim mạch", "Gợi ý bữa phụ ít muối", "Lịch làm việc có gây quá tải không?").
+- [x] `TASK-611`: Xây dựng bộ thẻ câu hỏi nhanh (Heartcare Prompt Chips: "Đánh giá thực đơn hôm nay cho tim mạch", "Gợi ý bữa phụ ít muối", "Lịch làm việc có gây quá tải không?").
 
 ---
 
