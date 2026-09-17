@@ -16,6 +16,7 @@
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ✅ Hoàn thành |
 | **M6** | AI Vision & Heartcare Assistant Integration | Tích hợp Google Gemini Multimodal API quét món ăn và Trợ lý AI chăm sóc tim mạch & lối sống | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ✅ Hoàn thành |
 | **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | `minhhungnt123/feat/m7-system-polish-deployment` | 1 Tuần | ⏳ Chờ thực hiện |
+| **M8** | Multi-Platform Expansion (Android & Desktop) | Đóng gói ứng dụng di động Android (Capacitor) và ứng dụng Desktop (Tauri v2) | `minhhungnt123/feat/m8-multiplatform-expansion` | 1 Tuần | ⏳ Chờ thực hiện |
 
 ---
 
@@ -171,6 +172,27 @@
 - [ ] `TASK-705`: Xây dựng `docker-compose.yml` chạy đồng thời PostgreSQL, Backend và Frontend.
 - [ ] `TASK-706`: Viết tài liệu API với Swagger/OpenAPI (`springdoc-openapi`).
 - [ ] `TASK-707`: Kiểm tra Responsive, accessibility và hiệu năng tải trang.
+
+---
+
+### 📱 Milestone 8: Multi-Platform Expansion (Android & Desktop)
+
+> **Mục tiêu**: Mở rộng và đóng gói ứng dụng LifeSync từ Web SPA thành ứng dụng di động Android Native (thông qua Capacitor) và ứng dụng Desktop Windows/macOS siêu nhẹ (thông qua Tauri v2).
+> **Nhánh Git (Branch)**: `minhhungnt123/feat/m8-multiplatform-expansion`
+
+#### Phần 1: Chuẩn bị Môi trường & Cấu hình Đa nền tảng (Cross-Platform Foundation)
+- [ ] `TASK-801`: Tách cấu hình Base URL động qua `.env` (`VITE_API_BASE_URL`) để tương thích linh hoạt giữa Web (`localhost`), Android Emulator (`10.0.2.2`), Thiết bị thật Android (LAN/Cloud IP) và Desktop.
+- [ ] `TASK-802`: Tối ưu hóa điều hướng (Routing) và cơ chế lưu trữ Token/State cho môi trường tệp cục bộ (Local Assets packaging).
+
+#### Phần 2: Đóng gói Ứng dụng Di động Android (Capacitor)
+- [ ] `TASK-803`: Cài đặt & Khởi tạo Capacitor CLI (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`), tạo thư mục dự án Android Studio.
+- [ ] `TASK-804`: Tích hợp Camera & File Plugin native (`@capacitor/camera`) phục vụ tính năng AI Food Scanner trên thiết bị di động.
+- [ ] `TASK-805`: Tích hợp Local Notifications plugin (`@capacitor/local-notifications`) hỗ trợ thông báo nhắc nhở lịch trình và bữa ăn trực tiếp trên thiết bị.
+- [ ] `TASK-806`: Build, ký số (Keystore) và xuất bản tệp cài đặt Android APK (`debug` và `release-ready`).
+
+#### Phần 3: Đóng gói Ứng dụng Desktop (Tauri v2)
+- [ ] `TASK-807`: Khởi tạo cấu hình Tauri v2 cho Vite/React (`@tauri-apps/cli`), thiết lập kích thước cửa sổ, System Tray, và Application Icon.
+- [ ] `TASK-808`: Đóng gói ứng dụng Desktop (Windows `.msi` / `.exe` installer) và kiểm thử hiệu năng/mức tiêu thụ RAM.
 
 ---
 
