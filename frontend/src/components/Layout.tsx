@@ -8,7 +8,6 @@ import {
   Bot,
 } from 'lucide-react';
 import { UserProfile } from './UserProfile';
-import { FloatingChatWidget } from './ai/FloatingChatWidget';
 
 export const Layout: React.FC = () => {
   const location = useLocation();
@@ -114,9 +113,6 @@ export const Layout: React.FC = () => {
       <main className="flex-1 min-w-0 h-screen overflow-y-auto overflow-x-hidden p-6 lg:p-8">
         <Outlet />
       </main>
-
-      {/* Floating AI Chatbot Widget (Only shown on non-chat pages) */}
-      {location.pathname !== '/ai-assistant' && <FloatingChatWidget />}
     </div>
   );
 };
