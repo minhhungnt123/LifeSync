@@ -20,9 +20,9 @@ public class GeminiProperties {
     private String apiKey;
 
     /**
-     * Default model identifier (e.g., gemini-3.6-flash, gemini-2.5-flash-lite).
+     * Default model identifier (e.g., gemini-3-flash-preview, gemini-2.5-flash-lite).
      */
-    private String model = "gemini-3.6-flash";
+    private String model = "gemini-3-flash-preview";
 
     /**
      * Fallback model used when primary model fails or encounters transient rate limits.
@@ -37,7 +37,7 @@ public class GeminiProperties {
     /**
      * HTTP client connection and read timeout in seconds.
      */
-    private int timeoutSeconds = 30;
+    private int timeoutSeconds = 60;
 
     /**
      * Maximum retry attempts for transient errors (e.g. 503, timeout).

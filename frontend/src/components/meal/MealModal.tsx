@@ -6,9 +6,10 @@ interface MealModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: MealLogRequest) => Promise<void>;
-  initialData?: MealLog | null;
+  initialData?: Partial<MealLog> | null;
   defaultMealType?: MealType;
   isLoading?: boolean;
+  aiHeartTip?: string | null;
 }
 
 const PRESET_FOODS = [
@@ -29,6 +30,7 @@ export const MealModal: React.FC<MealModalProps> = ({
   initialData,
   defaultMealType = 'BREAKFAST',
   isLoading = false,
+  aiHeartTip,
 }) => {
   const [mealType, setMealType] = useState<MealType>(defaultMealType);
   const [foodName, setFoodName] = useState('');
@@ -40,12 +42,12 @@ export const MealModal: React.FC<MealModalProps> = ({
 
   useEffect(() => {
     if (initialData) {
-      setMealType(initialData.mealType);
-      setFoodName(initialData.foodName);
-      setCalories(initialData.calories);
-      setProtein(initialData.protein);
-      setCarbs(initialData.carbs);
-      setFat(initialData.fat);
+      setMealType(initialData.mealType || defaultMealType);
+      setFoodName(initialData.foodName || '');
+      setCalories(initialData.calories !== undefined ? initialData.calories : '');
+      setProtein(initialData.protein !== undefined ? initialData.protein : '');
+      setCarbs(initialData.carbs !== undefined ? initialData.carbs : '');
+      setFat(initialData.fat !== undefined ? initialData.fat : '');
       setLoggedAt(initialData.loggedAt ? initialData.loggedAt.substring(0, 16) : getNowString());
     } else {
       setMealType(defaultMealType);
@@ -88,6 +90,9 @@ export const MealModal: React.FC<MealModalProps> = ({
     });
   };
 
+  const isEdit = Boolean(initialData && 'id' in initialData && initialData.id);
+  const isFromAiScan = Boolean(!isEdit && initialData?.foodName);
+
   if (!isOpen) return null;
 
   return (
@@ -96,15 +101,23 @@ export const MealModal: React.FC<MealModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-              <Utensils className="w-5 h-5" />
+            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+              isFromAiScan ? 'bg-purple-100 text-purple-600' : 'bg-indigo-50 text-indigo-600'
+            }`}>
+              {isFromAiScan ? <Sparkles className="w-5 h-5 animate-pulse" /> : <Utensils className="w-5 h-5" />}
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-800">
-                {initialData ? 'Chỉnh sửa bữa ăn' : 'Ghi nhận bữa ăn mới'}
+                {isEdit
+                  ? 'Chỉnh sửa bữa ăn'
+                  : isFromAiScan
+                  ? 'Xác nhận món ăn từ AI Scanner'
+                  : 'Ghi nhận bữa ăn mới'}
               </h2>
               <p className="text-xs text-slate-400">
-                Lưu nhật ký dinh dưỡng để AI hỗ trợ theo dõi sức khỏe
+                {isFromAiScan
+                  ? 'Kiểm tra và hiệu chỉnh lại thông số dinh dưỡng trước khi lưu'
+                  : 'Lưu nhật ký dinh dưỡng để AI hỗ trợ theo dõi sức khỏe'}
               </p>
             </div>
           </div>
@@ -115,6 +128,17 @@ export const MealModal: React.FC<MealModalProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* AI Heart Tip Banner */}
+        {aiHeartTip && (
+          <div className="mx-6 mt-4 p-3.5 rounded-2xl bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-100 flex items-start gap-2.5">
+            <span className="text-base">❤️</span>
+            <div>
+              <p className="text-xs font-bold text-rose-800">Lời khuyên tim mạch từ LifeSync AI:</p>
+              <p className="text-xs text-rose-700 leading-relaxed mt-0.5">{aiHeartTip}</p>
+            </div>
+          </div>
+        )}
 
         {/* Preset Quick Select */}
         <div className="px-6 py-3 bg-indigo-50/50 border-b border-indigo-100/50">
