@@ -23,29 +23,27 @@ export interface FoodScanResponse {
 }
 
 export interface AiChatMessage {
+  id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
+  disclaimer?: string;
   timestamp?: string;
 }
 
 export interface AiChatRequest {
   message: string;
-  history?: {
-    role: string;
-    content: string;
-  }[];
 }
 
 export interface AiChatResponse {
-  response: string;
-  heartcareScore?: number;
-  actionableTips?: string[];
-  contextUsed?: string[];
+  reply: string;
+  disclaimer?: string;
+  timestamp?: string;
 }
 
 export interface PromptSuggestion {
   id: string;
   title: string;
   prompt: string;
-  category: 'nutrition' | 'heart' | 'schedule' | 'general';
+  category: string;
+  icon?: string;
 }
