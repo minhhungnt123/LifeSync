@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { X, Clock, AlertTriangle, Trash2, Save, Tag, Flag, Timer } from 'lucide-react';
 import type { Schedule, ScheduleCategory, SchedulePriority, ScheduleRequest, ScheduleStatus } from '../types/schedule';
 import { formatToDateTimeLocal, formatToLocalDateTime } from '../utils/dateUtils';
+import { parseApiError } from '../utils/errorUtils';
 
 interface ScheduleModalProps {
   isOpen: boolean;
@@ -65,6 +66,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const [status, setStatus] = useState<ScheduleStatus>('PENDING');
   const [priority, setPriority] = useState<SchedulePriority>('MEDIUM');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [overlapWarning, setOverlapWarning] = useState<string | null>(null);
   // Inline delete confirmation state
   const [deleteConfirmPending, setDeleteConfirmPending] = useState(false);
@@ -104,6 +106,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
       setOverlapWarning(null);
     }
     setErrorMessage(null);
+    setFieldErrors({});
     setDeleteConfirmPending(false);
   }, [initialSchedule, defaultDates, isOpen]);
 
@@ -112,14 +115,20 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setFieldErrors({});
 
     if (!title.trim()) {
       setErrorMessage('Vui lòng nhập tiêu đề sự kiện!');
+      setFieldErrors({ title: 'Tiêu đề không được để trống' });
       return;
     }
 
     if (!startTime || !endTime) {
       setErrorMessage('Vui lòng chọn đầy đủ thời gian bắt đầu và kết thúc!');
+      setFieldErrors({
+        ...(!startTime ? { startTime: 'Thời gian bắt đầu không được để trống' } : {}),
+        ...(!endTime ? { endTime: 'Thời gian kết thúc không được để trống' } : {}),
+      });
       return;
     }
 
@@ -128,6 +137,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
 
     if (endD <= startD) {
       setErrorMessage('Thời gian kết thúc phải diễn ra sau thời gian bắt đầu!');
+      setFieldErrors({ endTime: 'Thời gian kết thúc phải sau thời gian bắt đầu' });
       return;
     }
 
@@ -145,9 +155,14 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
       await onSave(payload, initialSchedule?.id);
       onClose();
     } catch (err: any) {
-      setErrorMessage(err.message || 'Đã xảy ra lỗi khi lưu lịch trình!');
+      const parsed = parseApiError(err);
+      setErrorMessage(parsed.message || 'Đã xảy ra lỗi khi lưu lịch trình!');
+      if (parsed.fieldErrors) {
+        setFieldErrors(parsed.fieldErrors);
+      }
     }
   };
+
 
   const handleDeleteClick = () => {
     if (!deleteConfirmPending) {
@@ -216,11 +231,25 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                if (fieldErrors.title) {
+                  setFieldErrors((prev) => ({ ...prev, title: '' }));
+                }
+              }}
               placeholder="Nhập tiêu đề công việc / lịch hẹn..."
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm font-medium"
+              className={`w-full px-4 py-2.5 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none transition-all text-sm font-medium ${
+                fieldErrors.title
+                  ? 'bg-rose-50/60 border border-rose-400 focus:ring-2 focus:ring-rose-400/20'
+                  : 'bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+              }`}
               required
             />
+            {fieldErrors.title && (
+              <p className="text-[11px] text-rose-500 font-medium mt-1 flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" /> {fieldErrors.title}
+              </p>
+            )}
           </div>
 
           {/* Times + Duration */}
@@ -233,10 +262,24 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 <input
                   type="datetime-local"
                   value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  onChange={(e) => {
+                    setStartTime(e.target.value);
+                    if (fieldErrors.startTime) {
+                      setFieldErrors((prev) => ({ ...prev, startTime: '' }));
+                    }
+                  }}
+                  className={`w-full px-3.5 py-2 rounded-xl text-slate-800 text-xs font-medium focus:outline-none transition-all ${
+                    fieldErrors.startTime
+                      ? 'bg-rose-50/60 border border-rose-400 focus:ring-2 focus:ring-rose-400/20'
+                      : 'bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+                  }`}
                   required
                 />
+                {fieldErrors.startTime && (
+                  <p className="text-[11px] text-rose-500 font-medium mt-1 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" /> {fieldErrors.startTime}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1.5 flex items-center gap-1">
@@ -245,12 +288,27 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
                 <input
                   type="datetime-local"
                   value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                  onChange={(e) => {
+                    setEndTime(e.target.value);
+                    if (fieldErrors.endTime) {
+                      setFieldErrors((prev) => ({ ...prev, endTime: '' }));
+                    }
+                  }}
+                  className={`w-full px-3.5 py-2 rounded-xl text-slate-800 text-xs font-medium focus:outline-none transition-all ${
+                    fieldErrors.endTime
+                      ? 'bg-rose-50/60 border border-rose-400 focus:ring-2 focus:ring-rose-400/20'
+                      : 'bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+                  }`}
                   required
                 />
+                {fieldErrors.endTime && (
+                  <p className="text-[11px] text-rose-500 font-medium mt-1 flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3" /> {fieldErrors.endTime}
+                  </p>
+                )}
               </div>
             </div>
+
             {/* Duration Badge */}
             {duration ? (
               <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-600 font-semibold">

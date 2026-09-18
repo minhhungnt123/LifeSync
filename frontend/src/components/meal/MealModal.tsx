@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Utensils, Flame, Sparkles } from 'lucide-react';
+import { X, Utensils, Flame, Sparkles, AlertTriangle } from 'lucide-react';
 import type { MealLog, MealLogRequest, MealType } from '../../types/meal';
+import { parseApiError } from '../../utils/errorUtils';
 
 interface MealModalProps {
   isOpen: boolean;
@@ -39,6 +40,9 @@ export const MealModal: React.FC<MealModalProps> = ({
   const [carbs, setCarbs] = useState<number | ''>('');
   const [fat, setFat] = useState<number | ''>('');
   const [loggedAt, setLoggedAt] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
 
   useEffect(() => {
     if (initialData) {
@@ -58,6 +62,8 @@ export const MealModal: React.FC<MealModalProps> = ({
       setFat('');
       setLoggedAt(getNowString());
     }
+    setErrorMessage(null);
+    setFieldErrors({});
   }, [initialData, defaultMealType, isOpen]);
 
   const getNowString = () => {
@@ -73,22 +79,45 @@ export const MealModal: React.FC<MealModalProps> = ({
     setProtein(preset.protein);
     setCarbs(preset.carbs);
     setFat(preset.fat);
+    if (fieldErrors.foodName || fieldErrors.calories) {
+      setFieldErrors({});
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!foodName.trim()) return;
+    setErrorMessage(null);
+    setFieldErrors({});
 
-    await onSubmit({
-      mealType,
-      foodName: foodName.trim(),
-      calories: Number(calories) || 0,
-      protein: Number(protein) || 0,
-      carbs: Number(carbs) || 0,
-      fat: Number(fat) || 0,
-      loggedAt: loggedAt ? `${loggedAt}:00` : new Date().toISOString(),
-    });
+    if (!foodName.trim()) {
+      setFieldErrors({ foodName: 'Tên món ăn không được để trống!' });
+      return;
+    }
+
+    if (calories === '' || Number(calories) < 0) {
+      setFieldErrors({ calories: 'Lượng Calorie phải lớn hơn hoặc bằng 0!' });
+      return;
+    }
+
+    try {
+      await onSubmit({
+        mealType,
+        foodName: foodName.trim(),
+        calories: Number(calories) || 0,
+        protein: Number(protein) || 0,
+        carbs: Number(carbs) || 0,
+        fat: Number(fat) || 0,
+        loggedAt: loggedAt ? `${loggedAt}:00` : new Date().toISOString(),
+      });
+    } catch (err: any) {
+      const parsed = parseApiError(err);
+      setErrorMessage(parsed.message || 'Đã xảy ra lỗi khi lưu món ăn!');
+      if (parsed.fieldErrors) {
+        setFieldErrors(parsed.fieldErrors);
+      }
+    }
   };
+
 
   const isEdit = Boolean(initialData && 'id' in initialData && initialData.id);
   const isFromAiScan = Boolean(!isEdit && initialData?.foodName);
@@ -162,6 +191,14 @@ export const MealModal: React.FC<MealModalProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* General Error Banner */}
+          {errorMessage && (
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-xs flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           {/* Meal Type Select */}
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
@@ -201,10 +238,24 @@ export const MealModal: React.FC<MealModalProps> = ({
               type="text"
               required
               value={foodName}
-              onChange={(e) => setFoodName(e.target.value)}
+              onChange={(e) => {
+                setFoodName(e.target.value);
+                if (fieldErrors.foodName) {
+                  setFieldErrors((prev) => ({ ...prev, foodName: '' }));
+                }
+              }}
               placeholder="VD: Cơm gà xối mỡ, Phở bò, Salad..."
-              className="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-800 transition-all"
+              className={`w-full px-3.5 py-2.5 text-sm rounded-xl focus:outline-none transition-all ${
+                fieldErrors.foodName
+                  ? 'bg-rose-50/60 border border-rose-400 focus:ring-2 focus:ring-rose-400/20 text-slate-800'
+                  : 'bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-800'
+              }`}
             />
+            {fieldErrors.foodName && (
+              <p className="text-[11px] text-rose-500 font-medium mt-1 flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3" /> {fieldErrors.foodName}
+              </p>
+            )}
           </div>
 
           {/* Calories & Time */}
@@ -220,13 +271,28 @@ export const MealModal: React.FC<MealModalProps> = ({
                   min="0"
                   required
                   value={calories}
-                  onChange={(e) => setCalories(e.target.value === '' ? '' : Number(e.target.value))}
+                  onChange={(e) => {
+                    setCalories(e.target.value === '' ? '' : Number(e.target.value));
+                    if (fieldErrors.calories) {
+                      setFieldErrors((prev) => ({ ...prev, calories: '' }));
+                    }
+                  }}
                   placeholder="VD: 550"
-                  className="w-full pl-3.5 pr-8 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-800"
+                  className={`w-full pl-3.5 pr-8 py-2.5 text-sm rounded-xl focus:outline-none ${
+                    fieldErrors.calories
+                      ? 'bg-rose-50/60 border border-rose-400 focus:ring-2 focus:ring-rose-400/20 text-slate-800'
+                      : 'bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:bg-white text-slate-800'
+                  }`}
                 />
                 <Flame className="w-4 h-4 text-orange-500 absolute right-3 top-3" />
               </div>
+              {fieldErrors.calories && (
+                <p className="text-[11px] text-rose-500 font-medium mt-1 flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" /> {fieldErrors.calories}
+                </p>
+              )}
             </div>
+
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1.5">

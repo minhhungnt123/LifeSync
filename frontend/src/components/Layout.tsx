@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { UserProfile } from './UserProfile';
 import { FloatingChatWidget } from './ai/FloatingChatWidget';
+import { NetworkStatusBanner } from './common/NetworkStatusBanner';
 
 export const Layout: React.FC = () => {
   const location = useLocation();
@@ -21,11 +22,13 @@ export const Layout: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#F5F7FF' }}>
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#F5F7FF' }}>
+      <NetworkStatusBanner />
 
-      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-      <aside
-        className="w-64 h-screen shrink-0 p-4 flex flex-col justify-between overflow-y-auto"
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        {/* ── Sidebar ─────────────────────────────────────────────────────── */}
+        <aside
+          className="w-64 h-full shrink-0 p-4 flex flex-col justify-between overflow-y-auto"
         style={{
           background: '#ffffff',
           borderRight: '1px solid #E2E8F0',
@@ -111,12 +114,14 @@ export const Layout: React.FC = () => {
       </aside>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
-      <main className="flex-1 min-w-0 h-screen overflow-y-auto overflow-x-hidden p-6 lg:p-8">
+      <main className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden p-6 lg:p-8">
         <Outlet />
       </main>
 
       {/* Floating AI Chatbot Widget (Only shown on non-chat pages) */}
       {location.pathname !== '/ai-assistant' && <FloatingChatWidget />}
+      </div>
     </div>
   );
 };
+

@@ -18,8 +18,11 @@ import { MealCategorySection } from '../components/meal/MealCategorySection';
 import { MealModal } from '../components/meal/MealModal';
 import { FoodScanModal } from '../components/meal/FoodScanModal';
 import { FoodScanReviewModal } from '../components/meal/FoodScanReviewModal';
+import { ErrorState } from '../components/common/ErrorState';
+import { parseApiError } from '../utils/errorUtils';
 
 const EMPTY_MEAL_LOGS: MealLog[] = [];
+
 
 export const MealPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -37,19 +40,43 @@ export const MealPage: React.FC = () => {
   const [selectedMealType, setSelectedMealType] = useState<MealType>('BREAKFAST');
 
   // Fetch daily nutrition summary
-  const { data: summaryResponse, isLoading: isSummaryLoading } = useQuery({
+  const {
+    data: summaryResponse,
+    isLoading: isSummaryLoading,
+    isError: isSummaryError,
+    error: summaryError,
+    refetch: refetchSummary,
+    isFetching: isSummaryFetching,
+  } = useQuery({
     queryKey: ['dailyNutritionSummary', selectedDate],
     queryFn: () => mealApi.getDailyNutritionSummary(selectedDate),
   });
 
   // Fetch meal logs for selected date
-  const { data: mealsResponse, isLoading: isMealsLoading } = useQuery({
+  const {
+    data: mealsResponse,
+    isLoading: isMealsLoading,
+    isError: isMealsError,
+    error: mealsError,
+    refetch: refetchMeals,
+    isFetching: isMealsFetching,
+  } = useQuery({
     queryKey: ['mealLogs', selectedDate],
     queryFn: () => mealApi.getMealLogs({ date: selectedDate }),
   });
 
   const dailySummary = summaryResponse?.data;
   const mealLogs = mealsResponse?.data ?? EMPTY_MEAL_LOGS;
+
+  const isAnyError = isSummaryError || isMealsError;
+  const parsedMealError = isAnyError
+    ? parseApiError(summaryError || mealsError)
+    : null;
+
+  const handleRetryAll = () => {
+    refetchSummary();
+    refetchMeals();
+  };
 
   // Mutations
   const createMutation = useMutation({
@@ -61,7 +88,8 @@ export const MealPage: React.FC = () => {
       setIsModalOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Tạo bữa ăn thất bại!');
+      const p = parseApiError(error);
+      toast.error(p.message || 'Tạo bữa ăn thất bại!');
     },
   });
 
@@ -75,7 +103,8 @@ export const MealPage: React.FC = () => {
       setIsModalOpen(false);
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Cập nhật bữa ăn thất bại!');
+      const p = parseApiError(error);
+      toast.error(p.message || 'Cập nhật bữa ăn thất bại!');
     },
   });
 
@@ -87,9 +116,11 @@ export const MealPage: React.FC = () => {
       toast.success('Đã xóa bữa ăn!');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Xóa bữa ăn thất bại!');
+      const p = parseApiError(error);
+      toast.error(p.message || 'Xóa bữa ăn thất bại!');
     },
   });
+
 
   // Date Navigation
   const handlePrevDay = () => {
@@ -264,7 +295,19 @@ export const MealPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Error Banner */}
+      {isAnyError && parsedMealError && (
+        <ErrorState
+          title="Không thể tải nhật ký dinh dưỡng"
+          message={parsedMealError.message}
+          isNetworkError={parsedMealError.isNetworkError}
+          onRetry={handleRetryAll}
+          isRetrying={isSummaryFetching || isMealsFetching}
+        />
+      )}
+
       {/* Nutritional Progress Bars */}
+
       {isSummaryLoading ? (
         <div className="h-28 bg-slate-100 rounded-2xl animate-pulse" />
       ) : (

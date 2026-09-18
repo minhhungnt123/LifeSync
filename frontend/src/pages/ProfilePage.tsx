@@ -17,17 +17,27 @@ import {
 } from 'lucide-react';
 import { userApi } from '../api/userApi';
 import type { UserProfileUpdateRequest } from '../types/user';
+import { ErrorState } from '../components/common/ErrorState';
+import { parseApiError } from '../utils/errorUtils';
 
 export const ProfilePage: React.FC = () => {
   const queryClient = useQueryClient();
 
-  const { data: profileRes, isLoading: profileLoading } = useQuery({
+  const {
+    data: profileRes,
+    isLoading: profileLoading,
+    isError: profileIsError,
+    error: profileError,
+    refetch: refetchProfile,
+    isFetching: profileIsFetching,
+  } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const res = await userApi.getProfile();
       return res.data;
     },
   });
+
 
   const { data: metricsRes, isLoading: metricsLoading } = useQuery({
     queryKey: ['bodyMetrics'],
@@ -69,9 +79,12 @@ export const ProfilePage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['bodyMetrics'] });
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || 'Cập nhật thất bại!');
+      const p = parseApiError(err);
+      toast.error(p.message || 'Cập nhật thất bại!');
     },
   });
+
+  const parsedProfileError = profileIsError ? parseApiError(profileError) : null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,7 +123,18 @@ export const ProfilePage: React.FC = () => {
         </div>
       </div>
 
+      {profileIsError && parsedProfileError && (
+        <ErrorState
+          title="Không thể tải thông tin hồ sơ"
+          message={parsedProfileError.message}
+          isNetworkError={parsedProfileError.isNetworkError}
+          onRetry={() => refetchProfile()}
+          isRetrying={profileIsFetching}
+        />
+      )}
+
       {profileLoading ? (
+
         <div className="flex justify-center py-20">
           <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
         </div>

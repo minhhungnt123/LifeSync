@@ -3,7 +3,8 @@ import FullCalendar from '@fullcalendar/react';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, AlertCircle, RefreshCw, Layers, Clock } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon, RefreshCw, Layers, Clock } from 'lucide-react';
+
 import toast from 'react-hot-toast';
 
 import { scheduleApi } from '../api/scheduleApi';
@@ -16,6 +17,8 @@ import { DayScheduleCompactList } from '../components/schedule/DayScheduleCompac
 import { QuickRoutineDock } from '../components/schedule/QuickRoutineDock';
 import { toDateOnly, formatToLocalDateTime } from '../utils/dateUtils';
 import { CATEGORY_COLORS, CATEGORY_EMOJIS, MONTH_NAMES_VI } from '../constants/scheduleConstants';
+import { ErrorState } from '../components/common/ErrorState';
+import { parseApiError } from '../utils/errorUtils';
 
 const EMPTY_SCHEDULES: Schedule[] = [];
 
@@ -40,31 +43,42 @@ export const SchedulePage: React.FC = () => {
   const dayCalRef = useRef<any>(null);
 
   // ── Data ─────────────────────────────────────────────────────────────────
-  const { data: apiResponse, isLoading, isError, refetch } = useQuery({
+  const { data: apiResponse, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['schedules'],
     queryFn: () => scheduleApi.getSchedules(),
   });
 
   const schedules = apiResponse?.data ?? EMPTY_SCHEDULES;
+  const parsedQueryError = isError ? parseApiError(error) : null;
 
   // ── Mutations ─────────────────────────────────────────────────────────────
   const createMutation = useMutation({
     mutationFn: (data: ScheduleRequest) => scheduleApi.createSchedule(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['schedules'] }); },
-    onError: () => toast.error('Tạo lịch trình thất bại!'),
+    onError: (err: any) => {
+      const p = parseApiError(err);
+      toast.error(p.message || 'Tạo lịch trình thất bại!');
+    },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: ScheduleRequest }) => scheduleApi.updateSchedule(id, data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['schedules'] }); toast.success('Đã cập nhật lịch trình!'); },
-    onError: () => toast.error('Cập nhật lịch trình thất bại!'),
+    onError: (err: any) => {
+      const p = parseApiError(err);
+      toast.error(p.message || 'Cập nhật lịch trình thất bại!');
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => scheduleApi.deleteSchedule(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['schedules'] }); toast.success('Đã xóa sự kiện thành công!'); },
-    onError: () => toast.error('Không thể xóa sự kiện!'),
+    onError: (err: any) => {
+      const p = parseApiError(err);
+      toast.error(p.message || 'Không thể xóa sự kiện!');
+    },
   });
+
 
   // ── Calendar Events ───────────────────────────────────────────────────────
   const calendarEvents = useMemo(() =>
@@ -234,14 +248,16 @@ export const SchedulePage: React.FC = () => {
       <QuickRoutineDock selectedDate={selectedDate} onApplyRoutine={handleApplyRoutine} />
 
       {/* ── Error ──────────────────────────────────────────────────────── */}
-      {isError && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-400 flex items-center justify-between text-sm">
-          <div className="flex items-center space-x-2"><AlertCircle className="w-5 h-5" /><span>Đã xảy ra lỗi khi tải dữ liệu từ server.</span></div>
-          <button onClick={() => refetch()} className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 rounded-lg text-xs font-medium flex items-center gap-1">
-            <RefreshCw className="w-3.5 h-3.5" /> Thử lại
-          </button>
-        </div>
+      {isError && parsedQueryError && (
+        <ErrorState
+          title="Không thể tải danh sách lịch trình"
+          message={parsedQueryError.message}
+          isNetworkError={parsedQueryError.isNetworkError}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
       )}
+
 
       {/* ── Bottom Split ───────────────────────────────────────────────── */}
       {isLoading ? (
