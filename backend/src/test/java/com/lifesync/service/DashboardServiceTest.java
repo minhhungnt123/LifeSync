@@ -43,6 +43,9 @@ class DashboardServiceTest {
     @Mock
     private UserProfileRepository userProfileRepository;
 
+    @org.mockito.Spy
+    private com.lifesync.service.calculator.BodyMetricsCalculator bodyMetricsCalculator = new com.lifesync.service.calculator.BodyMetricsCalculator();
+
     @InjectMocks
     private DashboardServiceImpl dashboardService;
 

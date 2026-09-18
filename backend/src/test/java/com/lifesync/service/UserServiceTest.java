@@ -46,6 +46,9 @@ class UserServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @org.mockito.Spy
+    private com.lifesync.service.calculator.BodyMetricsCalculator bodyMetricsCalculator = new com.lifesync.service.calculator.BodyMetricsCalculator();
+
     @InjectMocks
     private UserServiceImpl userService;
 

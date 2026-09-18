@@ -19,6 +19,8 @@ import { MealModal } from '../components/meal/MealModal';
 import { FoodScanModal } from '../components/meal/FoodScanModal';
 import { FoodScanReviewModal } from '../components/meal/FoodScanReviewModal';
 
+const EMPTY_MEAL_LOGS: MealLog[] = [];
+
 export const MealPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<string>(
@@ -47,7 +49,7 @@ export const MealPage: React.FC = () => {
   });
 
   const dailySummary = summaryResponse?.data;
-  const mealLogs = mealsResponse?.data || [];
+  const mealLogs = mealsResponse?.data ?? EMPTY_MEAL_LOGS;
 
   // Mutations
   const createMutation = useMutation({

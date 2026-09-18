@@ -17,6 +17,8 @@ import { QuickRoutineDock } from '../components/schedule/QuickRoutineDock';
 import { toDateOnly } from '../utils/dateUtils';
 import { CATEGORY_COLORS, CATEGORY_EMOJIS, MONTH_NAMES_VI } from '../constants/scheduleConstants';
 
+const EMPTY_SCHEDULES: Schedule[] = [];
+
 export const SchedulePage: React.FC = () => {
   const queryClient = useQueryClient();
   const today = useMemo(() => new Date(), []);
@@ -43,7 +45,7 @@ export const SchedulePage: React.FC = () => {
     queryFn: () => scheduleApi.getSchedules(),
   });
 
-  const schedules = apiResponse?.data || [];
+  const schedules = apiResponse?.data ?? EMPTY_SCHEDULES;
 
   // ── Mutations ─────────────────────────────────────────────────────────────
   const createMutation = useMutation({
