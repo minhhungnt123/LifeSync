@@ -11,6 +11,7 @@ import { MealPage } from './pages/MealPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SettingsPage } from './pages/SettingsPage';
 import { NotificationsPage } from './pages/NotificationsPage';
+import { AiChatPage } from './pages/AiChatPage';
 import { Toaster } from 'react-hot-toast';
 
 const queryClient = new QueryClient({
@@ -41,7 +42,7 @@ export default function App() {
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/ai-assistant" element={<div className="text-slate-700">Trợ lý AI (Milestone 6)</div>} />
+                <Route path="/ai-assistant" element={<AiChatPage />} />
               </Route>
             </Route>
           </Routes>

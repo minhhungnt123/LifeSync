@@ -17,6 +17,7 @@ import { MealProgressBar } from '../components/meal/MealProgressBar';
 import { MealCategorySection } from '../components/meal/MealCategorySection';
 import { MealModal } from '../components/meal/MealModal';
 import { FoodScanModal } from '../components/meal/FoodScanModal';
+import { FoodScanReviewModal } from '../components/meal/FoodScanReviewModal';
 
 export const MealPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -26,6 +27,9 @@ export const MealPage: React.FC = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScanModalOpen, setIsScanModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [scannedResult, setScannedResult] = useState<FoodScanResponse | null>(null);
+  const [scannedPreviewUrl, setScannedPreviewUrl] = useState<string | null>(null);
   const [scannedHeartTip, setScannedHeartTip] = useState<string | null>(null);
   const [editingMeal, setEditingMeal] = useState<MealLog | null>(null);
   const [selectedMealType, setSelectedMealType] = useState<MealType>('BREAKFAST');
@@ -116,18 +120,22 @@ export const MealPage: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleScanSuccess = (result: FoodScanResponse) => {
-    setScannedHeartTip(result.heartHealthTip || null);
-    setEditingMeal({
-      foodName: result.foodName || '',
-      calories: Math.round(result.calories || 0),
-      protein: Math.round(result.macros?.protein || 0),
-      carbs: Math.round(result.macros?.carbs || 0),
-      fat: Math.round(result.macros?.fat || 0),
-      mealType: selectedMealType,
-      loggedAt: new Date().toISOString(),
-    } as any);
-    setIsModalOpen(true);
+  const handleScanSuccess = (result: FoodScanResponse, previewUrl: string) => {
+    setScannedResult(result);
+    setScannedPreviewUrl(previewUrl);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleConfirmReviewSave = async (data: MealLogRequest) => {
+    await createMutation.mutateAsync(data);
+    setIsReviewModalOpen(false);
+    setScannedResult(null);
+    setScannedPreviewUrl(null);
+  };
+
+  const handleRescan = () => {
+    setIsReviewModalOpen(false);
+    setIsScanModalOpen(true);
   };
 
   const handleDeleteMeal = (id: number) => {
@@ -325,6 +333,18 @@ export const MealPage: React.FC = () => {
         isOpen={isScanModalOpen}
         onClose={() => setIsScanModalOpen(false)}
         onScanSuccess={handleScanSuccess}
+      />
+
+      {/* AI Food Scan Review & Human-in-the-loop Modal */}
+      <FoodScanReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        scanResult={scannedResult}
+        previewUrl={scannedPreviewUrl}
+        onConfirmSave={handleConfirmReviewSave}
+        onRescan={handleRescan}
+        defaultMealType={selectedMealType}
+        isSaving={createMutation.isPending}
       />
     </div>
   );
