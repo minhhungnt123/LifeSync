@@ -14,12 +14,21 @@ import {
 } from 'lucide-react';
 import { notificationApi } from '../api/notificationApi';
 import type { NotificationItem, NotificationType } from '../types/user';
+import { ErrorState } from '../components/common/ErrorState';
+import { parseApiError } from '../utils/errorUtils';
 
 export const NotificationsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<'ALL' | 'UNREAD' | NotificationType>('ALL');
 
-  const { data: notificationsRes, isLoading } = useQuery({
+  const {
+    data: notificationsRes,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ['notifications', activeTab],
     queryFn: async () => {
       const params: { unreadOnly?: boolean; type?: NotificationType } = {};
@@ -30,6 +39,9 @@ export const NotificationsPage: React.FC = () => {
       return res.data;
     },
   });
+
+  const parsedNotificationError = isError ? parseApiError(error) : null;
+
 
   const markReadMutation = useMutation({
     mutationFn: (id: number) => notificationApi.markAsRead(id),
@@ -97,7 +109,18 @@ export const NotificationsPage: React.FC = () => {
         </div>
       </div>
 
+      {isError && parsedNotificationError && (
+        <ErrorState
+          title="Không thể tải danh sách thông báo"
+          message={parsedNotificationError.message}
+          isNetworkError={parsedNotificationError.isNetworkError}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
+      )}
+
       {/* ── Filter Tabs & Main Feed Card ─────────────────────────────────── */}
+
       <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-6">
         {/* Filter Bar */}
         <div className="flex items-center gap-2 flex-wrap border-b border-slate-100 pb-4">

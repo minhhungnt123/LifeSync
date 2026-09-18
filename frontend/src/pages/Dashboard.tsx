@@ -5,6 +5,8 @@ import { dashboardApi } from '../api/dashboardApi';
 import { CategoryDistributionChart } from '../components/dashboard/CategoryDistributionChart';
 import { NutritionTrendChart } from '../components/dashboard/NutritionTrendChart';
 import { ScheduleTrendChart } from '../components/dashboard/ScheduleTrendChart';
+import { ErrorState } from '../components/common/ErrorState';
+import { parseApiError } from '../utils/errorUtils';
 import {
   Sparkles,
   Calendar,
@@ -20,10 +22,20 @@ import {
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
 
-  const { data: dashboardResponse, isLoading } = useQuery({
+  const {
+    data: dashboardResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    isFetching,
+  } = useQuery({
     queryKey: ['dashboardSummary'],
     queryFn: () => dashboardApi.getSummary(),
   });
+
+  const parsedError = isError ? parseApiError(error) : null;
+
 
   const summary = dashboardResponse?.data;
 
@@ -67,6 +79,18 @@ export const Dashboard: React.FC = () => {
           <span>LifeSync AI Engine Active</span>
         </div>
       </div>
+
+      {/* ── Error Banner ─────────────────────────────────────────────────── */}
+      {isError && parsedError && (
+        <ErrorState
+          title="Không thể tải dữ liệu Dashboard"
+          message={parsedError.message}
+          isNetworkError={parsedError.isNetworkError}
+          onRetry={() => refetch()}
+          isRetrying={isFetching}
+        />
+      )}
+
 
       {/* ── Stat Summary Cards Grid ─────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
