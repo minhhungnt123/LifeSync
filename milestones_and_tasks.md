@@ -165,7 +165,7 @@
 > **Nhánh Git (Branch)**: `minhhungnt123/feat/m7-system-polish-deployment`
 
 - [x] `TASK-701`: Rà soát toàn bộ mã nguồn theo chuẩn SOLID, Clean Code và Naming Conventions.
-- [ ] `TASK-702`: Thực hiện kiểm thử tích hợp End-to-End (E2E) giữa React Frontend và Spring Boot Backend.
+- [x] `TASK-702`: Thực hiện kiểm thử tích hợp End-to-End (E2E) giữa React Frontend và Spring Boot Backend.
 - [ ] `TASK-703`: Đảm bảo xử lý lỗi trơn tru trên UI khi Backend mất kết nối hoặc trả về lỗi Validation.
 - [ ] `TASK-704`: Cấu hình `Dockerfile` cho Frontend và Backend.
 - [ ] `TASK-705`: Xây dựng `docker-compose.yml` chạy đồng thời PostgreSQL, Backend và Frontend.

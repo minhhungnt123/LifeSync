@@ -14,7 +14,7 @@ import { MonthCarousel } from '../components/schedule/MonthCarousel';
 import { WeekMiniPicker } from '../components/schedule/WeekMiniPicker';
 import { DayScheduleCompactList } from '../components/schedule/DayScheduleCompactList';
 import { QuickRoutineDock } from '../components/schedule/QuickRoutineDock';
-import { toDateOnly } from '../utils/dateUtils';
+import { toDateOnly, formatToLocalDateTime } from '../utils/dateUtils';
 import { CATEGORY_COLORS, CATEGORY_EMOJIS, MONTH_NAMES_VI } from '../constants/scheduleConstants';
 
 const EMPTY_SCHEDULES: Schedule[] = [];
@@ -104,7 +104,7 @@ export const SchedulePage: React.FC = () => {
     base.setHours(now.getHours(), 0, 0, 0);
     const end = new Date(base);
     end.setHours(base.getHours() + 1);
-    setDefaultDates({ start: base.toISOString(), end: end.toISOString() });
+    setDefaultDates({ start: formatToLocalDateTime(base), end: formatToLocalDateTime(end) });
     setIsModalOpen(true);
   }, [selectedDate]);
 
@@ -153,8 +153,8 @@ export const SchedulePage: React.FC = () => {
 
   const handleEventDrop = async (dropInfo: any) => {
     const s = dropInfo.event.extendedProps as unknown as Schedule;
-    const newStart = dropInfo.event.start?.toISOString();
-    const newEnd   = dropInfo.event.end?.toISOString();
+    const newStart = dropInfo.event.start ? formatToLocalDateTime(dropInfo.event.start) : null;
+    const newEnd   = dropInfo.event.end ? formatToLocalDateTime(dropInfo.event.end) : null;
     if (!newStart || !newEnd) return;
     try {
       await updateMutation.mutateAsync({ id: s.id, data: { title: s.title, description: s.description, startTime: newStart, endTime: newEnd, category: s.category, status: s.status, priority: s.priority } });
@@ -163,8 +163,8 @@ export const SchedulePage: React.FC = () => {
 
   const handleEventResize = async (resizeInfo: any) => {
     const s = resizeInfo.event.extendedProps as unknown as Schedule;
-    const newStart = resizeInfo.event.start?.toISOString();
-    const newEnd   = resizeInfo.event.end?.toISOString();
+    const newStart = resizeInfo.event.start ? formatToLocalDateTime(resizeInfo.event.start) : null;
+    const newEnd   = resizeInfo.event.end ? formatToLocalDateTime(resizeInfo.event.end) : null;
     if (!newStart || !newEnd) return;
     try {
       await updateMutation.mutateAsync({ id: s.id, data: { title: s.title, description: s.description, startTime: newStart, endTime: newEnd, category: s.category, status: s.status, priority: s.priority } });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { X, Clock, AlertTriangle, Trash2, Save, Tag, Flag, Timer } from 'lucide-react';
 import type { Schedule, ScheduleCategory, SchedulePriority, ScheduleRequest, ScheduleStatus } from '../types/schedule';
+import { formatToDateTimeLocal, formatToLocalDateTime } from '../utils/dateUtils';
 
 interface ScheduleModalProps {
   isOpen: boolean;
@@ -32,14 +33,6 @@ const STATUS_OPTIONS: { label: string; value: ScheduleStatus }[] = [
   { label: 'Hoàn thành', value: 'COMPLETED' },
   { label: 'Đã hủy', value: 'CANCELLED' },
 ];
-
-const formatDateTimeLocal = (dateStr?: string): string => {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return '';
-  const pad = (n: number) => (n < 10 ? `0${n}` : n);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
 
 const formatDuration = (startStr: string, endStr: string): string | null => {
   if (!startStr || !endStr) return null;
@@ -83,8 +76,8 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
     if (initialSchedule) {
       setTitle(initialSchedule.title || '');
       setDescription(initialSchedule.description || '');
-      setStartTime(formatDateTimeLocal(initialSchedule.startTime));
-      setEndTime(formatDateTimeLocal(initialSchedule.endTime));
+      setStartTime(formatToDateTimeLocal(initialSchedule.startTime));
+      setEndTime(formatToDateTimeLocal(initialSchedule.endTime));
       setCategory(initialSchedule.category || 'WORK');
       setStatus(initialSchedule.status || 'PENDING');
       setPriority(initialSchedule.priority || 'MEDIUM');
@@ -92,8 +85,8 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
     } else if (defaultDates) {
       setTitle('');
       setDescription('');
-      setStartTime(formatDateTimeLocal(defaultDates.start));
-      setEndTime(formatDateTimeLocal(defaultDates.end));
+      setStartTime(formatToDateTimeLocal(defaultDates.start));
+      setEndTime(formatToDateTimeLocal(defaultDates.end));
       setCategory('WORK');
       setStatus('PENDING');
       setPriority('MEDIUM');
@@ -103,8 +96,8 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
       const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
       setTitle('');
       setDescription('');
-      setStartTime(formatDateTimeLocal(now.toISOString()));
-      setEndTime(formatDateTimeLocal(oneHourLater.toISOString()));
+      setStartTime(formatToDateTimeLocal(now));
+      setEndTime(formatToDateTimeLocal(oneHourLater));
       setCategory('WORK');
       setStatus('PENDING');
       setPriority('MEDIUM');
@@ -141,8 +134,8 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({
     const payload: ScheduleRequest = {
       title: title.trim(),
       description: description.trim() || undefined,
-      startTime: new Date(startTime).toISOString(),
-      endTime: new Date(endTime).toISOString(),
+      startTime: formatToLocalDateTime(startTime),
+      endTime: formatToLocalDateTime(endTime),
       category,
       status,
       priority,

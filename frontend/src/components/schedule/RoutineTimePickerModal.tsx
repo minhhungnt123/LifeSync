@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Clock, Calendar, AlertTriangle, CheckCircle2, Zap, X, Sparkles } from 'lucide-react';
 import type { Schedule, ScheduleCategory } from '../../types/schedule';
 import { CATEGORY_COLORS, CATEGORY_EMOJIS } from '../../constants/scheduleConstants';
+import { formatToLocalDateTime } from '../../utils/dateUtils';
 
 export interface RoutineTimePickerModalProps {
   isOpen: boolean;
@@ -113,8 +114,8 @@ export const RoutineTimePickerModal: React.FC<RoutineTimePickerModalProps> = ({
     try {
       await onConfirm({
         title: routine.title,
-        startTimeISO: startDateTime.toISOString(),
-        endTimeISO: endDateTime.toISOString(),
+        startTimeISO: formatToLocalDateTime(startDateTime),
+        endTimeISO: formatToLocalDateTime(endDateTime),
         category: routine.category,
       });
       onClose();
