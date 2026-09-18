@@ -35,3 +35,42 @@ export const getWeekDays = (date: Date): Date[] => {
     return d;
   });
 };
+
+/**
+ * Format a Date or date string to local LocalDateTime ISO string (YYYY-MM-DDTHH:mm:ss).
+ * Preserves the local wall-clock time without UTC timezone shift.
+ */
+export const formatToLocalDateTime = (date: Date | string): string => {
+  if (!date) return '';
+  if (typeof date === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(date)) {
+      return date;
+    }
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(date)) {
+      return `${date}:00`;
+    }
+  }
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+};
+
+/**
+ * Format a Date or date string to HTML5 datetime-local input value (YYYY-MM-DDTHH:mm).
+ */
+export const formatToDateTimeLocal = (date?: Date | string | null): string => {
+  if (!date) return '';
+  if (typeof date === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return `${date}T08:00`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(date) && !date.includes('Z') && !/[+-]\d{2}:\d{2}$/.test(date)) {
+      return date.slice(0, 16);
+    }
+  }
+  const d = typeof date === 'string' ? new Date(date) : date;
+  if (isNaN(d.getTime())) return '';
+  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};

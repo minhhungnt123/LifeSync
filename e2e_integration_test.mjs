@@ -138,19 +138,18 @@ async function runE2ETests() {
   try {
     logStep(2, 'Testing Time & Schedule Management Flow (Create -> List -> Update -> Delete)');
 
-    const now = new Date();
-    const startTime = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
-    const endTime = new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString();
+    const targetStartTime = '2026-09-18T14:00:00';
+    const targetEndTime   = '2026-09-18T15:30:00';
 
-    // 2.1 Create Schedule
+    // 2.1 Create Schedule with local ISO date-time
     const createScheduleRes = await request('/api/v1/schedules', {
       method: 'POST',
       headers: authHeader,
       body: {
         title: 'Thực hiện E2E Testing Milestone 7',
         description: 'Kiểm thử tích hợp hệ thống toàn diện giữa React và Spring Boot',
-        startTime,
-        endTime,
+        startTime: targetStartTime,
+        endTime: targetEndTime,
         category: 'WORK',
         priority: 'HIGH',
       },
@@ -160,7 +159,11 @@ async function runE2ETests() {
       throw new Error(`Create schedule failed: ${JSON.stringify(createScheduleRes.data)}`);
     }
     scheduleId = createScheduleRes.data.data.id;
-    logSuccess(`Schedule created with ID: ${scheduleId}`);
+    const createdStartTime = createScheduleRes.data.data.startTime;
+    if (!createdStartTime.includes('14:00')) {
+      throw new Error(`Timezone shift detected on create! Expected 14:00, got: ${createdStartTime}`);
+    }
+    logSuccess(`Schedule created with ID: ${scheduleId} at exact local time: ${createdStartTime}`);
 
     // 2.2 List Schedules
     const listRes = await request('/api/v1/schedules', {
@@ -172,14 +175,14 @@ async function runE2ETests() {
     }
     logSuccess(`Fetched ${listRes.data.data.length} schedule(s) successfully.`);
 
-    // 2.3 Update Schedule Status to COMPLETED
+    // 2.3 Update Schedule (re-saving same local time to verify no timezone drift)
     const updateRes = await request(`/api/v1/schedules/${scheduleId}`, {
       method: 'PUT',
       headers: authHeader,
       body: {
-        title: 'Thực hiện E2E Testing Milestone 7 (Đã xong)',
-        startTime,
-        endTime,
+        title: 'Thực hiện E2E Testing Milestone 7 (Đã cập nhật)',
+        startTime: targetStartTime,
+        endTime: targetEndTime,
         category: 'WORK',
         status: 'COMPLETED',
         priority: 'HIGH',
@@ -188,7 +191,12 @@ async function runE2ETests() {
     if (updateRes.status !== 200 || updateRes.data?.data?.status !== 'COMPLETED') {
       throw new Error(`Update schedule failed: ${JSON.stringify(updateRes.data)}`);
     }
-    logSuccess(`Schedule ID ${scheduleId} marked as COMPLETED.`);
+    const updatedStartTime = updateRes.data.data.startTime;
+    if (!updatedStartTime.includes('14:00')) {
+      throw new Error(`Timezone shift detected on update! Expected 14:00, got: ${updatedStartTime}`);
+    }
+    logSuccess(`Schedule ID ${scheduleId} updated and preserved exact local time (14:00). Status marked as COMPLETED.`);
+
 
     passedCount++;
   } catch (err) {
