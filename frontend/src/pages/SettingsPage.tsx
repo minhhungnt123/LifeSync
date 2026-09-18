@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { userApi } from '../api/userApi';
 import { useAuth } from '../context/AuthContext';
-import type { UserPreferenceUpdateRequest } from '../types/user';
+import type { UserPreferenceUpdateRequest, ChangePasswordRequest } from '../types/user';
 
 export const SettingsPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -56,7 +56,7 @@ export const SettingsPage: React.FC = () => {
 
   // Mutations
   const changePasswordMutation = useMutation({
-    mutationFn: (data: any) => userApi.changePassword(data),
+    mutationFn: (data: ChangePasswordRequest) => userApi.changePassword(data),
     onSuccess: () => {
       toast.success('Đổi mật khẩu thành công!');
       setCurrentPassword('');
@@ -92,7 +92,7 @@ export const SettingsPage: React.FC = () => {
       downloadAnchor.click();
       downloadAnchor.remove();
       toast.success('Xuất dữ liệu thành công!');
-    } catch (err) {
+    } catch {
       toast.error('Không thể xuất dữ liệu!');
     } finally {
       setIsExporting(false);

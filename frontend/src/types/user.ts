@@ -79,6 +79,8 @@ export interface NotificationItem {
   createdAt: string;
 }
 
+import type { Schedule } from './schedule';
+
 export interface UnreadNotificationCount {
   unreadCount: number;
 }
@@ -86,7 +88,8 @@ export interface UnreadNotificationCount {
 export interface UserDataExport {
   profile: UserProfile;
   preference: UserPreference;
-  schedules: any[];
+  schedules: Schedule[];
   notifications: NotificationItem[];
   exportedAt: string;
 }
+

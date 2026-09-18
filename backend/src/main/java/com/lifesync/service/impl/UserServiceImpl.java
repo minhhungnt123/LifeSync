@@ -12,6 +12,7 @@ import com.lifesync.repository.UserRepository;
 import com.lifesync.service.UserService;
 import com.lifesync.service.ScheduleService;
 import com.lifesync.service.NotificationService;
+import com.lifesync.service.calculator.BodyMetricsCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ScheduleService scheduleService;
     private final NotificationService notificationService;
+    private final BodyMetricsCalculator bodyMetricsCalculator;
 
     @Override
     @Transactional(readOnly = true)
@@ -114,36 +116,18 @@ public class UserServiceImpl implements UserService {
         User user = getUserByEmail(userEmail);
         UserProfile profile = getOrCreateProfile(user);
 
-        Double heightCm = profile.getHeightCm() != null ? profile.getHeightCm() : 170.0;
-        Double weightKg = profile.getWeightKg() != null ? profile.getWeightKg() : 65.0;
+        Double heightCm = profile.getHeightCm() != null ? profile.getHeightCm() : BodyMetricsCalculator.DEFAULT_HEIGHT_CM;
+        Double weightKg = profile.getWeightKg() != null ? profile.getWeightKg() : BodyMetricsCalculator.DEFAULT_WEIGHT_KG;
         Double targetWeightKg = profile.getTargetWeightKg() != null ? profile.getTargetWeightKg() : weightKg;
-        String activityLevel = profile.getActivityLevel() != null ? profile.getActivityLevel() : "SEDENTARY";
+        String activityLevel = profile.getActivityLevel() != null ? profile.getActivityLevel() : BodyMetricsCalculator.DEFAULT_ACTIVITY_LEVEL;
 
-        // Calculate BMI
-        double heightM = heightCm / 100.0;
-        double bmi = Math.round((weightKg / (heightM * heightM)) * 10.0) / 10.0;
-        String bmiStatus = getBmiStatusLabel(bmi);
+        double bmi = bodyMetricsCalculator.calculateBmi(weightKg, heightCm);
+        String bmiStatus = bodyMetricsCalculator.getBmiStatusLabel(bmi);
 
-        // Calculate BMR (Mifflin-St Jeor)
-        int age = 25;
-        if (profile.getDateOfBirth() != null) {
-            age = Period.between(profile.getDateOfBirth(), LocalDate.now()).getYears();
-        }
-        boolean isFemale = "FEMALE".equalsIgnoreCase(profile.getGender()) || "Nữ".equalsIgnoreCase(profile.getGender());
-        double bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + (isFemale ? -161 : 5);
-        bmr = Math.round(bmr * 10.0) / 10.0;
-
-        // Calculate TDEE
-        double activityMultiplier = getActivityMultiplier(activityLevel);
-        double tdee = Math.round((bmr * activityMultiplier) * 10.0) / 10.0;
-
-        // Recommended Daily Calories
-        int recommendedCalories = (int) Math.round(tdee);
-        if (targetWeightKg < weightKg - 0.5) {
-            recommendedCalories = (int) Math.round(tdee - 500); // Weight loss target
-        } else if (targetWeightKg > weightKg + 0.5) {
-            recommendedCalories = (int) Math.round(tdee + 400); // Weight gain target
-        }
+        int age = bodyMetricsCalculator.calculateAge(profile.getDateOfBirth());
+        double bmr = bodyMetricsCalculator.calculateBmr(weightKg, heightCm, age, profile.getGender());
+        double tdee = bodyMetricsCalculator.calculateTdee(bmr, activityLevel);
+        int recommendedCalories = bodyMetricsCalculator.calculateRecommendedDailyCalories(tdee, weightKg, targetWeightKg);
 
         return BodyMetricsRecommendationResponse.builder()
                 .heightCm(heightCm)
@@ -239,19 +223,5 @@ public class UserServiceImpl implements UserService {
                 .scheduleReminderMinutes(preference.getScheduleReminderMinutes())
                 .mealReminderEnabled(preference.getMealReminderEnabled())
                 .build();
-    }
-
-    private String getBmiStatusLabel(double bmi) {
-        if (bmi < 18.5) return "Gầy (Underweight)";
-        if (bmi < 23.0) return "Bình thường (Normal)";
-        if (bmi < 25.0) return "Tiền béo phì (Overweight)";
-        return "Béo phì (Obese)";
-    }
-
-    private double getActivityMultiplier(String activityLevel) {
-        if ("LIGHTLY_ACTIVE".equalsIgnoreCase(activityLevel)) return 1.375;
-        if ("MODERATELY_ACTIVE".equalsIgnoreCase(activityLevel)) return 1.55;
-        if ("VERY_ACTIVE".equalsIgnoreCase(activityLevel)) return 1.725;
-        return 1.2; // SEDENTARY or default
     }
 }

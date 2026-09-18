@@ -8,6 +8,7 @@ import com.lifesync.repository.ScheduleRepository;
 import com.lifesync.repository.UserProfileRepository;
 import com.lifesync.repository.UserRepository;
 import com.lifesync.service.DashboardService;
+import com.lifesync.service.calculator.BodyMetricsCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +28,7 @@ public class DashboardServiceImpl implements DashboardService {
     private final ScheduleRepository scheduleRepository;
     private final MealLogRepository mealLogRepository;
     private final UserProfileRepository userProfileRepository;
-
-    private static final double DEFAULT_TARGET_CALORIES = 2000.0;
+    private final BodyMetricsCalculator bodyMetricsCalculator;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,8 +60,8 @@ public class DashboardServiceImpl implements DashboardService {
         double todayFat = todayMeals.stream().mapToDouble(MealLog::getFat).sum();
 
         double targetCalories = userProfileRepository.findByUserId(userId)
-                .map(this::calculateTargetCalories)
-                .orElse(DEFAULT_TARGET_CALORIES);
+                .map(bodyMetricsCalculator::calculateTargetCalories)
+                .orElse(BodyMetricsCalculator.DEFAULT_TARGET_CALORIES);
 
         // 3. Category Distribution (All Schedules of User)
         List<Schedule> allSchedules = scheduleRepository.findByUserIdOrderByStartTimeAsc(userId);
@@ -179,38 +179,5 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         return result;
-    }
-
-    private double calculateTargetCalories(UserProfile profile) {
-        if (profile.getWeightKg() == null || profile.getHeightCm() == null) {
-            return DEFAULT_TARGET_CALORIES;
-        }
-
-        // BMR formula (Mifflin-St Jeor): 10*weight + 6.25*height - 5*age + s
-        double weight = profile.getWeightKg();
-        double height = profile.getHeightCm();
-        int age = 25; // default age if dob not set
-        if (profile.getDateOfBirth() != null) {
-            age = LocalDate.now().getYear() - profile.getDateOfBirth().getYear();
-        }
-
-        double bmr;
-        if ("FEMALE".equalsIgnoreCase(profile.getGender())) {
-            bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
-        } else {
-            bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
-        }
-
-        double multiplier = 1.375; // Light activity default
-        if (profile.getActivityLevel() != null) {
-            switch (profile.getActivityLevel().toUpperCase()) {
-                case "SEDENTARY" -> multiplier = 1.2;
-                case "MODERATE" -> multiplier = 1.55;
-                case "ACTIVE" -> multiplier = 1.725;
-                case "VERY_ACTIVE" -> multiplier = 1.9;
-            }
-        }
-
-        return bmr * multiplier;
     }
 }

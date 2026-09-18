@@ -41,7 +41,7 @@ public class UserController {
     @PutMapping("/preferences")
     public ResponseEntity<ApiResponse<UserPreferenceResponse>> updatePreference(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody UserPreferenceUpdateRequest request) {
+            @Valid @RequestBody UserPreferenceUpdateRequest request) {
         UserPreferenceResponse response = userService.updatePreference(userDetails.getUsername(), request);
         return ResponseEntity.ok(ApiResponse.success(response, "Cập nhật cài đặt thành công!"));
     }
