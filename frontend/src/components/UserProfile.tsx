@@ -193,7 +193,7 @@ export const UserProfile: React.FC = () => {
         onClick={togglePopover}
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        aria-label="Account menu"
+        aria-label="Menu tài khoản cá nhân"
         className={`w-full flex items-center justify-between rounded-xl p-2.5 transition-all text-left border cursor-pointer ${
           isOpen
             ? 'bg-indigo-50/80 border-indigo-200 shadow-xs'
