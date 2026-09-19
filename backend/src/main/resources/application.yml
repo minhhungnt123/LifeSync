@@ -36,3 +36,15 @@ gemini:
   rate-limit:
     requests-per-minute: 10
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    doc-expansion: none
+    persist-authorization: true
+
+
