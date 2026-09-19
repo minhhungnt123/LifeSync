@@ -1,21 +1,78 @@
 services:
+  # ==========================================
+  # 1. Database Service: PostgreSQL 16
+  # ==========================================
   postgres:
     image: postgres:16-alpine
     container_name: lifesync-postgres
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: lifesync_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: ${POSTGRES_DB:-lifesync_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d lifesync_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lifesync_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    networks:
+      - lifesync-network
+
+  # ==========================================
+  # 2. Backend Service: Spring Boot 3 + Java 21
+  # ==========================================
+  backend:
+    container_name: lifesync-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-lifesync_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250655368566D5971}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3-flash-preview}
+      GEMINI_FALLBACK_MODEL: ${GEMINI_FALLBACK_MODEL:-gemini-2.5-flash}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    networks:
+      - lifesync-network
+
+  # ==========================================
+  # 3. Frontend Service: React + Vite + Nginx
+  # ==========================================
+  frontend:
+    container_name: lifesync-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api/v1
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    networks:
+      - lifesync-network
+
+networks:
+  lifesync-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+    driver: local

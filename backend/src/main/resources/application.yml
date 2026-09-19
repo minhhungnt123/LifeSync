@@ -5,13 +5,13 @@ spring:
   application:
     name: lifesync-backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/lifesync_db
-    username: postgres
-    password: postgrespassword
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/lifesync_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgrespassword}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: true
     properties:
       hibernate:
@@ -23,8 +23,8 @@ spring:
       max-request-size: 15MB
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250655368566D5971
-  expiration-ms: 86400000
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250655368566D5971}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 
 gemini:
   api-key: ${GEMINI_API_KEY:}

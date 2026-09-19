@@ -169,7 +169,7 @@
 - [x] `TASK-703`: Đảm bảo xử lý lỗi trơn tru trên UI khi Backend mất kết nối hoặc trả về lỗi Validation.
 
 - [x] `TASK-704`: Cấu hình `Dockerfile` cho Frontend và Backend.
-- [ ] `TASK-705`: Xây dựng `docker-compose.yml` chạy đồng thời PostgreSQL, Backend và Frontend.
+- [x] `TASK-705`: Xây dựng `docker-compose.yml` chạy đồng thời PostgreSQL, Backend và Frontend.
 - [ ] `TASK-706`: Viết tài liệu API với Swagger/OpenAPI (`springdoc-openapi`).
 - [ ] `TASK-707`: Kiểm tra Responsive, accessibility và hiệu năng tải trang.
 
