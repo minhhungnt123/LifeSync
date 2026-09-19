@@ -49,7 +49,7 @@ export const Layout: React.FC = () => {
       {/* ── Mobile Top Header (Visible only on < 768px) ─────────────────── */}
       <header
         role="banner"
-        className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0 z-30 shadow-xs"
+        className="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200 shrink-0 z-30 shadow-sm"
       >
         <div className="flex items-center gap-2.5">
           <div
@@ -75,7 +75,7 @@ export const Layout: React.FC = () => {
             aria-label={isMobileMenuOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-drawer"
-            className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+            className="p-2 rounded-xl text-slate-600 hover:text-indigo-600 hover:bg-indigo-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -126,7 +126,7 @@ export const Layout: React.FC = () => {
                     aria-current={isActive ? 'page' : undefined}
                     className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
                       isActive
-                        ? 'bg-indigo-50 text-indigo-600 border border-indigo-200 shadow-2xs font-semibold'
+                        ? 'bg-indigo-50 text-indigo-600 border border-indigo-200 shadow-sm font-semibold'
                         : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600 border border-transparent'
                     }`}
                   >
@@ -151,7 +151,7 @@ export const Layout: React.FC = () => {
         {/* ── Mobile Drawer Overlay (Active when isMobileMenuOpen is true) ─ */}
         {isMobileMenuOpen && (
           <div
-            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 md:hidden transition-opacity"
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
             aria-hidden="true"
           />
@@ -224,7 +224,7 @@ export const Layout: React.FC = () => {
           role="main"
           id="main-content"
           tabIndex={-1}
-          className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 focus:outline-hidden"
+          className="flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 focus:outline-none"
         >
           <Outlet />
         </main>
