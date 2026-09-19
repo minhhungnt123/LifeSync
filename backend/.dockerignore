@@ -1,0 +1,10 @@
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+.agents/
+*.md
+.DS_Store
+Thumbs.db
