@@ -14,9 +14,9 @@
 | **M3.5** | User Profile, Settings & Notifications | Quản lý thông tin cá nhân, chỉ số thể chất (BMI/TDEE), cài đặt tài khoản & trung tâm thông báo | `minhhungnt123/feat/m3.5-user-profile-settings` | 1 Tuần | ✅ Hoàn thành |
 | **M4** | Meal Management | Quản lý nhật ký bữa ăn, tính toán chỉ số dinh dưỡng (Calories/Macros) | `minhhungnt123/feat/m4-meal-management` | 1 Tuần | ✅ Hoàn thành |
 | **M5** | Dashboard & Analytics | Trực quan hóa dữ liệu hiệu suất thời gian và bữa ăn bằng biểu đồ Recharts | `minhhungnt123/feat/m5-dashboard-analytics` | 1 Tuần | ✅ Hoàn thành |
-| **M6** | AI Vision & Heartcare Assistant Integration | Tích hợp Google Gemini Multimodal API quét món ăn và Trợ lý AI chăm sóc tim mạch & lối sống | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ⏳ Chờ thực hiện |
+| **M6** | AI Vision & Heartcare Assistant Integration | Tích hợp Google Gemini Multimodal API quét món ăn và Trợ lý AI chăm sóc tim mạch & lối sống | `minhhungnt123/feat/m6-ai-assistant` | 1.5 Tuần | ✅ Hoàn thành |
 | **M7** | System Polish, Testing & Deployment | Kiểm thử tự động, tối ưu hóa giao diện, đóng gói Docker và chuẩn bị phát hành | `minhhungnt123/feat/m7-system-polish-deployment` | 1 Tuần | ✅ Hoàn thành |
-| **M8** | Multi-Platform Expansion (Android & Desktop) | Đóng gói ứng dụng di động Android (Capacitor) và ứng dụng Desktop (Tauri v2) | `minhhungnt123/feat/m8-multiplatform-expansion` | 1 Tuần | ⏳ Chờ thực hiện |
+| **M8** | Multi-Platform Expansion (Android & Desktop) | Đóng gói ứng dụng di động Android (Capacitor) và ứng dụng Desktop (Tauri v2) | `minhhungnt123/feat/m8-multiplatform-expansion` | 1 Tuần | 🔄 Đang thực hiện |
 
 ---
 
@@ -182,7 +182,7 @@
 > **Nhánh Git (Branch)**: `minhhungnt123/feat/m8-multiplatform-expansion`
 
 #### Phần 1: Chuẩn bị Môi trường & Cấu hình Đa nền tảng (Cross-Platform Foundation)
-- [ ] `TASK-801`: Tách cấu hình Base URL động qua `.env` (`VITE_API_BASE_URL`) để tương thích linh hoạt giữa Web (`localhost`), Android Emulator (`10.0.2.2`), Thiết bị thật Android (LAN/Cloud IP) và Desktop.
+- [x] `TASK-801`: Tách cấu hình Base URL động qua `.env` (`VITE_API_BASE_URL`) để tương thích linh hoạt giữa Web (`localhost`), Android Emulator (`10.0.2.2`), Thiết bị thật Android (LAN/Cloud IP) và Desktop.
 - [ ] `TASK-802`: Tối ưu hóa điều hướng (Routing) và cơ chế lưu trữ Token/State cho môi trường tệp cục bộ (Local Assets packaging).
 
 #### Phần 2: Đóng gói Ứng dụng Di động Android (Capacitor)
