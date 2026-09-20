@@ -1,11 +1,12 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LoadingFallback } from './components/common/LoadingFallback';
+import { AppRouter } from './components/common/AppRouter';
 import { Toaster } from 'react-hot-toast';
 
 // Dynamic Code Splitting for Performance Optimization
@@ -33,7 +34,7 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Router>
+          <AppRouter>
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 {/* Public Routes */}
@@ -52,9 +53,12 @@ export default function App() {
                     <Route path="/ai-assistant" element={<AiChatPage />} />
                   </Route>
                 </Route>
+
+                {/* Catch-all Fallback Route for Deep Links & 404 */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
-          </Router>
+          </AppRouter>
         </AuthProvider>
         <Toaster
           position="top-right"

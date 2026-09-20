@@ -10,6 +10,8 @@
  * 4. Desktop Tauri & Web Production (/api/v1 hoặc Reverse Proxy)
  */
 
+import { storage } from '../utils/storage';
+
 export const STORAGE_KEY_API_OVERRIDE = 'lifesync_api_base_url_override';
 export const DEFAULT_API_BASE_URL = 'http://localhost:8080/api/v1';
 
@@ -30,19 +32,13 @@ export function getDefaultApiBaseUrl(): string {
 
 /**
  * Lấy Base URL đang có hiệu lực.
- * Cho phép ghi đè (Override) tại thời điểm runtime (lưu trong localStorage)
+ * Cho phép ghi đè (Override) tại thời điểm runtime (lưu qua storage)
  * để tiện cho việc kiểm thử trên thiết bị di động thật hoặc môi trường dev.
  */
 export function getApiBaseUrl(): string {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const customOverride = window.localStorage.getItem(STORAGE_KEY_API_OVERRIDE);
-      if (customOverride && customOverride.trim().length > 0) {
-        return customOverride.trim();
-      }
-    }
-  } catch (error) {
-    console.warn('[apiConfig] Không thể truy cập localStorage để đọc URL override:', error);
+  const customOverride = storage.getItem(STORAGE_KEY_API_OVERRIDE);
+  if (customOverride && customOverride.trim().length > 0) {
+    return customOverride.trim();
   }
 
   return getDefaultApiBaseUrl();
@@ -52,39 +48,20 @@ export function getApiBaseUrl(): string {
  * Thiết lập URL ghi đè khi runtime (phục vụ tester/developer trên di động)
  */
 export function setApiBaseUrlOverride(url: string): void {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.setItem(STORAGE_KEY_API_OVERRIDE, url.trim());
-    }
-  } catch (error) {
-    console.error('[apiConfig] Không thể lưu API Base URL override:', error);
-  }
+  storage.setItem(STORAGE_KEY_API_OVERRIDE, url.trim());
 }
 
 /**
  * Xóa URL ghi đè runtime để quay về mặc định của hệ thống
  */
 export function clearApiBaseUrlOverride(): void {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      window.localStorage.removeItem(STORAGE_KEY_API_OVERRIDE);
-    }
-  } catch (error) {
-    console.error('[apiConfig] Không thể xóa API Base URL override:', error);
-  }
+  storage.removeItem(STORAGE_KEY_API_OVERRIDE);
 }
 
 /**
  * Kiểm tra xem hiện tại có đang sử dụng URL ghi đè runtime hay không
  */
 export function isApiOverridden(): boolean {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const customOverride = window.localStorage.getItem(STORAGE_KEY_API_OVERRIDE);
-      return Boolean(customOverride && customOverride.trim().length > 0);
-    }
-  } catch {
-    return false;
-  }
-  return false;
+  const customOverride = storage.getItem(STORAGE_KEY_API_OVERRIDE);
+  return Boolean(customOverride && customOverride.trim().length > 0);
 }

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User, LoginRequest, RegisterRequest } from '../types/auth';
 import { authApi } from '../api/authApi';
+import { storage } from '../utils/storage';
 
 interface AuthContextType {
   user: User | null;
@@ -15,7 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(storage.getToken());
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (data: LoginRequest) => {
     const response = await authApi.login(data);
     if (response.success) {
-      localStorage.setItem('token', response.data.token);
+      storage.setToken(response.data.token);
       setToken(response.data.token);
       setUser(response.data.user);
     }
@@ -54,14 +55,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (data: RegisterRequest) => {
     const response = await authApi.register(data);
     if (response.success) {
-      localStorage.setItem('token', response.data.token);
+      storage.setToken(response.data.token);
       setToken(response.data.token);
       setUser(response.data.user);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    storage.removeToken();
     setToken(null);
     setUser(null);
   };

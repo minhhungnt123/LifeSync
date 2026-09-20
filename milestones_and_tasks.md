@@ -183,7 +183,7 @@
 
 #### Phần 1: Chuẩn bị Môi trường & Cấu hình Đa nền tảng (Cross-Platform Foundation)
 - [x] `TASK-801`: Tách cấu hình Base URL động qua `.env` (`VITE_API_BASE_URL`) để tương thích linh hoạt giữa Web (`localhost`), Android Emulator (`10.0.2.2`), Thiết bị thật Android (LAN/Cloud IP) và Desktop.
-- [ ] `TASK-802`: Tối ưu hóa điều hướng (Routing) và cơ chế lưu trữ Token/State cho môi trường tệp cục bộ (Local Assets packaging).
+- [x] `TASK-802`: Tối ưu hóa điều hướng (Routing) và cơ chế lưu trữ Token/State cho môi trường tệp cục bộ (Local Assets packaging).
 
 #### Phần 2: Đóng gói Ứng dụng Di động Android (Capacitor)
 - [ ] `TASK-803`: Cài đặt & Khởi tạo Capacitor CLI (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`), tạo thư mục dự án Android Studio.
