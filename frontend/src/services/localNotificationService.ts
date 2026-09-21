@@ -75,9 +75,36 @@ export interface ILocalNotificationService {
   setupNotificationActionListener(onNavigate: (route: string) => void): Promise<void>;
 }
 
+/**
+ * Phát âm thanh nhắc nhở qua Web Audio API (dùng cho Web fallback)
+ */
+const playNotificationSound = () => {
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15); // A5
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch {
+    // Ignore audio error if user hasn't interacted with page yet
+  }
+};
+
 class LocalNotificationService implements ILocalNotificationService {
   private isInitialized = false;
   private isNative = Capacitor.isNativePlatform();
+  // Quản lý bộ đếm thời gian cho Web Browser Fallback (chạy khi tab còn mở)
+  private webTimers: Map<number, ReturnType<typeof setTimeout>> = new Map();
+  private onNavigateCallback: ((route: string) => void) | null = null;
 
   /**
    * Khởi tạo kênh thông báo Android (Notification Channels)
@@ -168,29 +195,106 @@ class LocalNotificationService implements ILocalNotificationService {
   }
 
   /**
+   * Tính toán thời điểm kích hoạt thông báo một cách thông minh (Smart Trigger Calculator):
+   * - Nếu thời gian tới sự kiện > reminderMinutes: Kích hoạt trước reminderMinutes phút.
+   * - Nếu thời gian tới sự kiện <= reminderMinutes nhưng VẪN TRONG TƯƠNG LAI: Kích hoạt đúng giờ bắt đầu sự kiện!
+   * - Nếu sự kiện đã trôi qua trong quá khứ: Trả về null.
+   */
+  private calculateSmartTrigger(schedule: Schedule, reminderMinutes: number): {
+    triggerDate: Date;
+    isExactStart: boolean;
+    startDate: Date;
+  } | null {
+    if (!schedule.startTime) return null;
+
+    // Chuẩn hóa chuỗi thời gian
+    const timeStr = schedule.startTime.length === 16 ? `${schedule.startTime}:00` : schedule.startTime;
+    const startDate = new Date(timeStr);
+    if (isNaN(startDate.getTime())) return null;
+
+    const now = new Date();
+    // Nếu sự kiện đã diễn ra và kết thúc trong quá khứ -> bỏ qua
+    if (startDate <= now) {
+      return null;
+    }
+
+    const preferredTriggerTime = new Date(startDate.getTime() - reminderMinutes * 60 * 1000);
+
+    // Nếu thời điểm "báo trước" vẫn còn trong tương lai -> Dùng thời điểm báo trước
+    if (preferredTriggerTime > now) {
+      return {
+        triggerDate: preferredTriggerTime,
+        isExactStart: false,
+        startDate,
+      };
+    }
+
+    // Nếu thời điểm "báo trước" đã rơi vào quá khứ (ví dụ người dùng tạo sự kiện sau 3 phút nữa,
+    // trong khi cài đặt báo trước 15 phút) -> Kích hoạt NGAY ĐÚNG GIỜ BẮT ĐẦU SỰ KIỆN!
+    return {
+      triggerDate: startDate,
+      isExactStart: true,
+      startDate,
+    };
+  }
+
+  /**
+   * Kích hoạt hiển thị thông báo trên Web Browser (Web Notification API Fallback)
+   */
+  private triggerWebNotification(title: string, body: string, route = '/schedule'): void {
+    if (typeof window === 'undefined' || !('Notification' in window)) return;
+
+    if (Notification.permission === 'granted') {
+      try {
+        playNotificationSound();
+        const notif = new Notification(title, {
+          body,
+          icon: '/favicon.ico',
+        });
+        notif.onclick = () => {
+          window.focus();
+          if (this.onNavigateCallback) {
+            this.onNavigateCallback(route);
+          }
+        };
+      } catch (e) {
+        console.warn('[LocalNotificationService] Lỗi tạo Web Notification:', e);
+      }
+    }
+  }
+
+  /**
    * Đặt thông báo nhắc nhở cho một lịch trình cụ thể
    */
   public async scheduleTaskReminder(schedule: Schedule, reminderMinutes = 15): Promise<boolean> {
-    if (!schedule.startTime) return false;
-
-    const startDate = new Date(schedule.startTime);
-    const triggerDate = new Date(startDate.getTime() - reminderMinutes * 60 * 1000);
-    const now = new Date();
-
-    // Không lập lịch cho các sự kiện đã qua trong quá khứ
-    if (triggerDate <= now) {
+    const triggerInfo = this.calculateSmartTrigger(schedule, reminderMinutes);
+    if (!triggerInfo) {
+      console.log(`[LocalNotificationService] Bỏ qua lịch "${schedule.title}": Đã diễn ra trong quá khứ.`);
       return false;
     }
 
+    const { triggerDate, isExactStart, startDate } = triggerInfo;
     const notificationId = ID_OFFSET.SCHEDULE_BASE + (schedule.id % 90_000);
 
+    const title = isExactStart
+      ? `⏰ Đã đến giờ: ${schedule.title}`
+      : `⏰ Nhắc nhở: ${schedule.title}`;
+    const body = isExactStart
+      ? `Lịch trình bắt đầu ngay bây giờ (${startDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})!`
+      : `Sắp diễn ra sau ${reminderMinutes} phút (${startDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})`;
+
+    console.log(
+      `[LocalNotificationService] 📅 Đã lên lịch: "${schedule.title}" -> Báo lúc ${triggerDate.toLocaleTimeString('vi-VN')} (cách hiện tại ${Math.round((triggerDate.getTime() - Date.now()) / 1000)}s)`
+    );
+
+    // Xử lý trên Android Native
     if (this.isNative) {
       try {
         await this.initChannels();
         const notification: LocalNotificationSchema = {
           id: notificationId,
-          title: `⏰ Nhắc nhở lịch: ${schedule.title}`,
-          body: `Sắp diễn ra sau ${reminderMinutes} phút (${startDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})`,
+          title,
+          body,
           schedule: { at: triggerDate, allowWhileIdle: true },
           channelId: NOTIFICATION_CHANNELS.SCHEDULES.id,
           extra: {
@@ -207,6 +311,20 @@ class LocalNotificationService implements ILocalNotificationService {
       }
     }
 
+    // Xử lý trên Web Browser (In-memory Timer fallback)
+    const delayMs = triggerDate.getTime() - Date.now();
+    if (delayMs > 0 && delayMs < 24 * 60 * 60 * 1000) {
+      if (this.webTimers.has(notificationId)) {
+        clearTimeout(this.webTimers.get(notificationId));
+      }
+      const timer = setTimeout(() => {
+        this.triggerWebNotification(title, body, '/schedule');
+        this.webTimers.delete(notificationId);
+      }, delayMs);
+      this.webTimers.set(notificationId, timer);
+      return true;
+    }
+
     return false;
   }
 
@@ -215,6 +333,14 @@ class LocalNotificationService implements ILocalNotificationService {
    */
   public async cancelScheduleReminder(scheduleId: number): Promise<void> {
     const notificationId = ID_OFFSET.SCHEDULE_BASE + (scheduleId % 90_000);
+
+    // Hủy trên Web Timer
+    if (this.webTimers.has(notificationId)) {
+      clearTimeout(this.webTimers.get(notificationId));
+      this.webTimers.delete(notificationId);
+    }
+
+    // Hủy trên Android Native
     if (this.isNative) {
       try {
         await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
@@ -232,60 +358,87 @@ class LocalNotificationService implements ILocalNotificationService {
     reminderMinutes = 15,
     enabled = true
   ): Promise<void> {
-    if (!this.isNative) return;
+    // Xóa toàn bộ Web timers cũ
+    for (const [, timer] of this.webTimers) {
+      clearTimeout(timer);
+    }
+    this.webTimers.clear();
 
-    try {
-      await this.initChannels();
-
-      // Nếu người dùng tắt tính năng thông báo lịch, hủy toàn bộ thông báo lịch hiện có
-      if (!enabled) {
-        const pending = await LocalNotifications.getPending();
-        const scheduleNotifications = pending.notifications.filter(
-          (n) => n.id >= ID_OFFSET.SCHEDULE_BASE && n.id < ID_OFFSET.MEAL_BREAKFAST
-        );
-        if (scheduleNotifications.length > 0) {
-          await LocalNotifications.cancel({ notifications: scheduleNotifications });
-        }
-        return;
-      }
-
-      const now = new Date();
-      const maxFutureDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 ngày tới
-
-      const notificationsToSchedule: LocalNotificationSchema[] = [];
-
-      for (const schedule of schedules) {
-        // Bỏ qua lịch đã hoàn thành hoặc hủy
-        if (schedule.status === 'COMPLETED' || schedule.status === 'CANCELLED') {
-          continue;
-        }
-
-        const startDate = new Date(schedule.startTime);
-        const triggerDate = new Date(startDate.getTime() - reminderMinutes * 60 * 1000);
-
-        // Chỉ lập lịch cho các sự kiện sắp tới trong vòng 7 ngày
-        if (triggerDate > now && triggerDate <= maxFutureDate) {
-          notificationsToSchedule.push({
-            id: ID_OFFSET.SCHEDULE_BASE + (schedule.id % 90_000),
-            title: `⏰ Sắp diễn ra: ${schedule.title}`,
-            body: `Bắt đầu lúc ${startDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} (sau ${reminderMinutes} phút)`,
-            schedule: { at: triggerDate, allowWhileIdle: true },
-            channelId: NOTIFICATION_CHANNELS.SCHEDULES.id,
-            extra: {
-              route: '/schedule',
-              scheduleId: schedule.id,
-            },
-          });
+    if (!enabled) {
+      if (this.isNative) {
+        try {
+          const pending = await LocalNotifications.getPending();
+          const scheduleNotifications = pending.notifications.filter(
+            (n) => n.id >= ID_OFFSET.SCHEDULE_BASE && n.id < ID_OFFSET.MEAL_BREAKFAST
+          );
+          if (scheduleNotifications.length > 0) {
+            await LocalNotifications.cancel({ notifications: scheduleNotifications });
+          }
+        } catch (err) {
+          console.warn('[LocalNotificationService] Lỗi xóa pending notifications:', err);
         }
       }
+      return;
+    }
 
-      if (notificationsToSchedule.length > 0) {
-        // Giới hạn tối đa 40 thông báo để đảm bảo an toàn với quota hệ điều hành Android
-        const batch = notificationsToSchedule.slice(0, 40);
+    const now = new Date();
+    const maxFutureDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 ngày tới
+    const nativeNotifications: LocalNotificationSchema[] = [];
+
+    for (const schedule of schedules) {
+      // Bỏ qua lịch đã hoàn thành hoặc hủy
+      if (schedule.status === 'COMPLETED' || schedule.status === 'CANCELLED') {
+        continue;
+      }
+
+      const triggerInfo = this.calculateSmartTrigger(schedule, reminderMinutes);
+      if (!triggerInfo) continue;
+
+      const { triggerDate, isExactStart, startDate } = triggerInfo;
+      if (triggerDate > maxFutureDate) continue;
+
+      const notificationId = ID_OFFSET.SCHEDULE_BASE + (schedule.id % 90_000);
+      const title = isExactStart
+        ? `⏰ Đã đến giờ: ${schedule.title}`
+        : `⏰ Nhắc nhở: ${schedule.title}`;
+      const body = isExactStart
+        ? `Lịch trình bắt đầu ngay bây giờ (${startDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})!`
+        : `Sắp diễn ra sau ${reminderMinutes} phút (${startDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })})`;
+
+      // Lên lịch Web Timer (nếu thời gian kích hoạt trong vòng 24 giờ)
+      const delayMs = triggerDate.getTime() - Date.now();
+      if (delayMs > 0 && delayMs < 24 * 60 * 60 * 1000) {
+        const timer = setTimeout(() => {
+          this.triggerWebNotification(title, body, '/schedule');
+          this.webTimers.delete(notificationId);
+        }, delayMs);
+        this.webTimers.set(notificationId, timer);
+      }
+
+      // Đưa vào danh sách nạp Native
+      nativeNotifications.push({
+        id: notificationId,
+        title,
+        body,
+        schedule: { at: triggerDate, allowWhileIdle: true },
+        channelId: NOTIFICATION_CHANNELS.SCHEDULES.id,
+        extra: {
+          route: '/schedule',
+          scheduleId: schedule.id,
+        },
+      });
+    }
+
+    console.log(`[LocalNotificationService] Đã đồng bộ ${nativeNotifications.length} lịch trình vào hàng đợi thông báo.`);
+
+    if (this.isNative && nativeNotifications.length > 0) {
+      try {
+        await this.initChannels();
+        const batch = nativeNotifications.slice(0, 40);
         await LocalNotifications.schedule({ notifications: batch });
+      } catch (error) {
+        console.warn('[LocalNotificationService] Lỗi đồng bộ toàn bộ lịch trình native:', error);
       }
-    } catch (error) {
-      console.warn('[LocalNotificationService] Lỗi đồng bộ toàn bộ lịch trình:', error);
     }
   }
 
@@ -419,19 +572,16 @@ class LocalNotificationService implements ILocalNotificationService {
       }
     }
 
-    // Web Fallback
+    // Web Fallback (3 giây đếm ngược)
     if (typeof window !== 'undefined' && 'Notification' in window) {
-      try {
-        if (Notification.permission === 'granted') {
-          new Notification('🔔 Thông báo thử nghiệm LifeSync (Web)', {
-            body: 'Hệ thống thông báo hoạt động tốt trên trình duyệt!',
-            icon: '/favicon.ico',
-          });
-          return true;
-        }
-      } catch (err) {
-        console.warn('[LocalNotificationService] Web notification error:', err);
-      }
+      setTimeout(() => {
+        this.triggerWebNotification(
+          '🔔 Thông báo thử nghiệm LifeSync (Web)',
+          'Hệ thống thông báo hoạt động tốt trên trình duyệt!',
+          '/settings'
+        );
+      }, 3000);
+      return true;
     }
 
     return false;
@@ -441,6 +591,8 @@ class LocalNotificationService implements ILocalNotificationService {
    * Lắng nghe sự kiện người dùng nhấn vào thông báo (Action Performed) để Deep Link
    */
   public async setupNotificationActionListener(onNavigate: (route: string) => void): Promise<void> {
+    this.onNavigateCallback = onNavigate;
+
     if (!this.isNative) return;
 
     try {

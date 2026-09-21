@@ -75,7 +75,16 @@ export const SchedulePage: React.FC = () => {
   // ── Mutations ─────────────────────────────────────────────────────────────
   const createMutation = useMutation({
     mutationFn: (data: ScheduleRequest) => scheduleApi.createSchedule(data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['schedules'] }); },
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['schedules'] });
+      const minutes = prefRes?.scheduleReminderMinutes ?? 15;
+      if (res?.data) {
+        localNotificationService.scheduleTaskReminder(res.data, minutes);
+        toast.success('Đã tạo lịch trình và kích hoạt nhắc nhở!');
+      } else {
+        toast.success('Tạo lịch trình thành công!');
+      }
+    },
     onError: (err: any) => {
       const p = parseApiError(err);
       toast.error(p.message || 'Tạo lịch trình thất bại!');
@@ -84,7 +93,14 @@ export const SchedulePage: React.FC = () => {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: ScheduleRequest }) => scheduleApi.updateSchedule(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['schedules'] }); toast.success('Đã cập nhật lịch trình!'); },
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['schedules'] });
+      const minutes = prefRes?.scheduleReminderMinutes ?? 15;
+      if (res?.data) {
+        localNotificationService.scheduleTaskReminder(res.data, minutes);
+      }
+      toast.success('Đã cập nhật lịch trình và nhắc nhở!');
+    },
     onError: (err: any) => {
       const p = parseApiError(err);
       toast.error(p.message || 'Cập nhật lịch trình thất bại!');
