@@ -56,7 +56,7 @@ export const SettingsPage: React.FC = () => {
   const [isTestingNotification, setIsTestingNotification] = useState<boolean>(false);
 
   useEffect(() => {
-    localNotificationService.checkPermissions().then((permitted) => {
+    localNotificationService.checkPermissions().then((permitted: boolean) => {
       setHasNotificationPermission(permitted);
     });
   }, []);

@@ -15,8 +15,7 @@ export const NOTIFICATION_CHANNELS = {
     id: 'lifesync_schedules',
     name: 'Nhắc nhở Lịch trình',
     description: 'Thông báo trước khi bắt đầu nhiệm vụ hoặc sự kiện trong lịch',
-    importance: 4, // High importance (hiển thị popup trên màn hình & phát âm thanh)
-    sound: 'res_custom_notification',
+    importance: 4, // High importance (hiển thị popup trên màn hình & phát chuông báo)
     vibration: true,
   },
   MEALS: {
@@ -59,6 +58,70 @@ export const WATER_REMINDER_TIMES = [
 ];
 
 /**
+ * Quản lý Web AudioContext chung để vượt qua Browser Autoplay Policy
+ */
+let globalAudioCtx: AudioContext | null = null;
+const initAudioContext = () => {
+  if (typeof window === 'undefined') return null;
+  if (!globalAudioCtx) {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    if (AudioCtx) {
+      globalAudioCtx = new AudioCtx();
+    }
+  }
+  if (globalAudioCtx && globalAudioCtx.state === 'suspended') {
+    globalAudioCtx.resume().catch(() => {});
+  }
+  return globalAudioCtx;
+};
+
+// Mở khóa AudioContext ngay khi người dùng chạm hoặc click vào màn hình
+if (typeof window !== 'undefined') {
+  const unlockAudio = () => {
+    initAudioContext();
+    window.removeEventListener('click', unlockAudio);
+    window.removeEventListener('touchstart', unlockAudio);
+  };
+  window.addEventListener('click', unlockAudio);
+  window.addEventListener('touchstart', unlockAudio);
+}
+
+/**
+ * Phát âm thanh chuông "Ting Ting" (Crystal Chime) qua Web Audio API
+ */
+const playNotificationSound = () => {
+  try {
+    const ctx = initAudioContext();
+    if (!ctx) return;
+
+    // Nốt 1: C6 (1046.5 Hz) - Ting đầu tiên
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(1046.5, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.35, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 0.35);
+
+    // Nốt 2: E6 (1318.5 Hz) - Ting thứ hai ngân vang
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1318.5, ctx.currentTime + 0.12);
+    gain2.gain.setValueAtTime(0.4, ctx.currentTime + 0.12);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+    osc2.start(ctx.currentTime + 0.12);
+    osc2.stop(ctx.currentTime + 0.65);
+  } catch {
+    // Ignore audio error
+  }
+};
+/**
  * Interface cho Local Notification Service
  * Tuân thủ Dependency Inversion Principle (DIP)
  */
@@ -74,30 +137,6 @@ export interface ILocalNotificationService {
   sendTestNotification(): Promise<boolean>;
   setupNotificationActionListener(onNavigate: (route: string) => void): Promise<void>;
 }
-
-/**
- * Phát âm thanh nhắc nhở qua Web Audio API (dùng cho Web fallback)
- */
-const playNotificationSound = () => {
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15); // A5
-    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
-  } catch {
-    // Ignore audio error if user hasn't interacted with page yet
-  }
-};
 
 class LocalNotificationService implements ILocalNotificationService {
   private isInitialized = false;
