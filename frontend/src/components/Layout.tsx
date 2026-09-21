@@ -12,10 +12,14 @@ import {
 import { UserProfile } from './UserProfile';
 import { FloatingChatWidget } from './ai/FloatingChatWidget';
 import { NetworkStatusBanner } from './common/NetworkStatusBanner';
+import { useLocalNotifications } from '../hooks/useLocalNotifications';
 
 export const Layout: React.FC = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Tự động khởi tạo Notification Channels và xử lý Deep Linking toàn cục
+  useLocalNotifications();
 
   // Close mobile drawer whenever route changes
   useEffect(() => {

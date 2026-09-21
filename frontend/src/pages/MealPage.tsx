@@ -20,6 +20,8 @@ import { FoodScanModal } from '../components/meal/FoodScanModal';
 import { FoodScanReviewModal } from '../components/meal/FoodScanReviewModal';
 import { ErrorState } from '../components/common/ErrorState';
 import { parseApiError } from '../utils/errorUtils';
+import { localNotificationService } from '../services/localNotificationService';
+import { userApi } from '../api/userApi';
 
 const EMPTY_MEAL_LOGS: MealLog[] = [];
 
@@ -67,6 +69,25 @@ export const MealPage: React.FC = () => {
 
   const dailySummary = summaryResponse?.data;
   const mealLogs = mealsResponse?.data ?? EMPTY_MEAL_LOGS;
+
+  // Lấy cài đặt người dùng để kích hoạt nhắc nhở bữa ăn
+  const { data: prefRes } = useQuery({
+    queryKey: ['userPreference'],
+    queryFn: async () => {
+      const res = await userApi.getPreference();
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Tự động đồng bộ nhắc nhở bữa ăn và nhắc nhở uống đủ 2L nước mỗi ngày
+  React.useEffect(() => {
+    const mealEnabled = prefRes?.mealReminderEnabled ?? true;
+    localNotificationService.syncMealDailyReminders(mealEnabled);
+
+    const waterEnabled = localStorage.getItem('lifesync_water_reminder_enabled') !== 'false';
+    localNotificationService.syncWaterIntakeReminders(waterEnabled);
+  }, [prefRes]);
 
   const isAnyError = isSummaryError || isMealsError;
   const parsedMealError = isAnyError
