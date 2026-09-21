@@ -8,9 +8,15 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test:e2e": "node ../e2e_integration_test.mjs"
+    "test:e2e": "node ../e2e_integration_test.mjs",
+    "cap:sync": "npm run build && cap sync android",
+    "cap:open:android": "cap open android",
+    "cap:run:android": "cap run android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@fullcalendar/daygrid": "^6.1.21",
     "@fullcalendar/interaction": "^6.1.21",
     "@fullcalendar/react": "^6.1.15",
