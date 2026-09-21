@@ -13,9 +13,14 @@ import {
   Loader2,
   KeyRound,
   ShieldAlert,
+  Smartphone,
+  Droplets,
+  CheckCircle2,
+  Volume2,
 } from 'lucide-react';
 import { userApi } from '../api/userApi';
 import { useAuth } from '../context/AuthContext';
+import { localNotificationService } from '../services/localNotificationService';
 import type { UserPreferenceUpdateRequest, ChangePasswordRequest } from '../types/user';
 
 export const SettingsPage: React.FC = () => {
@@ -42,6 +47,19 @@ export const SettingsPage: React.FC = () => {
   const [scheduleReminderEnabled, setScheduleReminderEnabled] = useState(true);
   const [scheduleReminderMinutes, setScheduleReminderMinutes] = useState(15);
   const [mealReminderEnabled, setMealReminderEnabled] = useState(true);
+
+  // Local Notifications & Water Intake State
+  const [waterReminderEnabled, setWaterReminderEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('lifesync_water_reminder_enabled') !== 'false';
+  });
+  const [hasNotificationPermission, setHasNotificationPermission] = useState<boolean>(false);
+  const [isTestingNotification, setIsTestingNotification] = useState<boolean>(false);
+
+  useEffect(() => {
+    localNotificationService.checkPermissions().then((permitted) => {
+      setHasNotificationPermission(permitted);
+    });
+  }, []);
 
   useEffect(() => {
     if (prefRes) {
@@ -108,8 +126,39 @@ export const SettingsPage: React.FC = () => {
     changePasswordMutation.mutate({ currentPassword, newPassword, confirmPassword });
   };
 
+  const handleRequestNotificationPermission = async () => {
+    const granted = await localNotificationService.requestPermissions();
+    setHasNotificationPermission(granted);
+    if (granted) {
+      toast.success('Đã cấp quyền thông báo thành công!');
+    } else {
+      toast.error('Quyền thông báo bị từ chối hoặc chưa được bật trong cài đặt hệ thống.');
+    }
+  };
+
+  const handleTestNotification = async () => {
+    setIsTestingNotification(true);
+    try {
+      toast('Đang gửi thông báo thử nghiệm trong 3 giây...', { icon: '⏳' });
+      const success = await localNotificationService.sendTestNotification();
+      if (!success) {
+        toast.error('Không thể gửi thông báo. Vui lòng kiểm tra quyền thiết bị!');
+      }
+    } finally {
+      setTimeout(() => setIsTestingNotification(false), 3500);
+    }
+  };
+
   const handlePrefSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Lưu trạng thái nhắc uống nước vào localStorage
+    localStorage.setItem('lifesync_water_reminder_enabled', String(waterReminderEnabled));
+
+    // Đồng bộ thông báo cục bộ Native
+    localNotificationService.syncMealDailyReminders(mealReminderEnabled);
+    localNotificationService.syncWaterIntakeReminders(waterReminderEnabled);
+
     updatePrefMutation.mutate({
       language,
       timeFormat,
@@ -306,6 +355,22 @@ export const SettingsPage: React.FC = () => {
                       className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500"
                     />
                   </div>
+
+                  <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <Droplets className="w-4 h-4 text-cyan-600" />
+                      <div>
+                        <p className="text-xs font-bold text-slate-800">Nhắc nhở Uống đủ 2 Lít Nước mỗi ngày</p>
+                        <p className="text-[11px] text-slate-500">Tự động nhắc 5 lần (09:00, 11:00, 14:00, 16:00, 20:00 - mỗi lần 400ml)</p>
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={waterReminderEnabled}
+                      onChange={(e) => setWaterReminderEnabled(e.target.checked)}
+                      className="h-4 w-4 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                  </div>
                 </div>
 
                 <div className="flex justify-end pt-2">
@@ -327,8 +392,69 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Right Column: Data Export & Danger Zone (5 cols) ─────────────── */}
+        {/* ── Right Column: Local Notifications & Data Export (5 cols) ─────────────── */}
         <div className="lg:col-span-5 space-y-6">
+          {/* Local Device Notifications Card */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <Smartphone className="w-5 h-5 text-indigo-600" />
+                <h2 className="text-base font-bold text-slate-800">Thông báo Thiết bị (Native)</h2>
+              </div>
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                  hasNotificationPermission
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                }`}
+              >
+                {hasNotificationPermission ? (
+                  <>
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Đã cấp quyền
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="w-3 h-3 text-amber-600" /> Chưa cấp quyền
+                  </>
+                )}
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Cho phép LifeSync đẩy thông báo nhắc nhở lịch trình, bữa ăn và uống đủ 2 lít nước trực tiếp lên thanh trạng thái thiết bị di động.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-2.5 pt-1">
+              {!hasNotificationPermission && (
+                <button
+                  type="button"
+                  onClick={handleRequestNotificationPermission}
+                  className="flex-1 py-2.5 px-3 rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 active:scale-95"
+                >
+                  <Bell className="w-4 h-4" /> Cấp quyền thông báo
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleTestNotification}
+                disabled={isTestingNotification}
+                className={`py-2.5 px-4 rounded-xl font-bold text-xs border transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
+                  hasNotificationPermission
+                    ? 'w-full text-indigo-600 bg-indigo-50 border-indigo-200 hover:bg-indigo-100'
+                    : 'text-slate-600 bg-slate-50 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                {isTestingNotification ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                ) : (
+                  <Volume2 className="w-4 h-4 text-indigo-600" />
+                )}
+                Thử nghiệm thông báo (3s)
+              </button>
+            </div>
+          </div>
+
           {/* Data Export Card */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100">

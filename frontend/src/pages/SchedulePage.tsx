@@ -19,6 +19,8 @@ import { toDateOnly, formatToLocalDateTime } from '../utils/dateUtils';
 import { CATEGORY_COLORS, CATEGORY_EMOJIS, MONTH_NAMES_VI } from '../constants/scheduleConstants';
 import { ErrorState } from '../components/common/ErrorState';
 import { parseApiError } from '../utils/errorUtils';
+import { localNotificationService } from '../services/localNotificationService';
+import { userApi } from '../api/userApi';
 
 const EMPTY_SCHEDULES: Schedule[] = [];
 
@@ -51,6 +53,25 @@ export const SchedulePage: React.FC = () => {
   const schedules = apiResponse?.data ?? EMPTY_SCHEDULES;
   const parsedQueryError = isError ? parseApiError(error) : null;
 
+  // Lấy cài đặt thông báo của người dùng để đồng bộ Local Notifications
+  const { data: prefRes } = useQuery({
+    queryKey: ['userPreference'],
+    queryFn: async () => {
+      const res = await userApi.getPreference();
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Tự động đồng bộ các sự kiện sắp diễn ra vào hàng đợi thông báo native trên thiết bị
+  React.useEffect(() => {
+    if (schedules && schedules.length > 0) {
+      const enabled = prefRes?.scheduleReminderEnabled ?? true;
+      const minutes = prefRes?.scheduleReminderMinutes ?? 15;
+      localNotificationService.syncAllScheduleReminders(schedules, minutes, enabled);
+    }
+  }, [schedules, prefRes]);
+
   // ── Mutations ─────────────────────────────────────────────────────────────
   const createMutation = useMutation({
     mutationFn: (data: ScheduleRequest) => scheduleApi.createSchedule(data),
@@ -71,7 +92,10 @@ export const SchedulePage: React.FC = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => scheduleApi.deleteSchedule(id),
+    mutationFn: (id: number) => {
+      localNotificationService.cancelScheduleReminder(id);
+      return scheduleApi.deleteSchedule(id);
+    },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['schedules'] }); toast.success('Đã xóa sự kiện thành công!'); },
     onError: (err: any) => {
       const p = parseApiError(err);
