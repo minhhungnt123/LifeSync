@@ -78,11 +78,14 @@ export const FoodScanReviewModal: React.FC<FoodScanReviewModalProps> = ({
 
   useEffect(() => {
     if (scanResult) {
-      const initialCal = Math.round(scanResult.calories || 0);
-      const initialProt = Math.round(scanResult.macros?.protein || 0);
-      const initialCarb = Math.round(scanResult.macros?.carbs || 0);
-      const initialFat = Math.round(scanResult.macros?.fat || 0);
-      const initialSod = Math.round(scanResult.macros?.sodium || 0);
+      const raw = scanResult as Record<string, any>;
+      const rawMacros = scanResult.macros as Record<string, any> | undefined;
+
+      const initialCal = Math.round(Number(scanResult.calories || raw?.calorie) || 0);
+      const initialProt = Math.round(Number(scanResult.macros?.protein ?? rawMacros?.protein_g ?? raw?.protein ?? raw?.protein_g) || 0);
+      const initialCarb = Math.round(Number(scanResult.macros?.carbs ?? rawMacros?.carbohydrates ?? rawMacros?.carb ?? raw?.carbs ?? raw?.carbohydrates) || 0);
+      const initialFat = Math.round(Number(scanResult.macros?.fat ?? rawMacros?.total_fat ?? rawMacros?.fats ?? raw?.fat ?? raw?.total_fat) || 0);
+      const initialSod = Math.round(Number(scanResult.macros?.sodium ?? rawMacros?.sodium_mg ?? rawMacros?.salt ?? raw?.sodium ?? raw?.sodium_mg) || 0);
 
       setFoodName(scanResult.foodName || 'Món ăn nhận diện');
       setMealType(defaultMealType);

@@ -265,6 +265,7 @@ public class GeminiAiClientImpl implements GeminiAiClient {
             cleanJson = cleanJson.substring(0, cleanJson.length() - 3);
         }
         cleanJson = cleanJson.trim();
+        log.info("Parsing Gemini structured JSON response (length: {} chars): {}", cleanJson.length(), cleanJson);
 
         try {
             return objectMapper.readValue(cleanJson, responseClass);

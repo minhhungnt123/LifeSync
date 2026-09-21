@@ -14,7 +14,7 @@ const config: CapacitorConfig = {
   appName: 'LifeSync AI',
   webDir: 'dist',
   server: {
-    androidScheme: 'https',
+    androidScheme: 'http',
     cleartext: true,
   },
 };
