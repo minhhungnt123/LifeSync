@@ -61,6 +61,25 @@ public class FoodScanResponse {
     private NutritionMacrosDto macros = new NutritionMacrosDto();
 
     /**
+     * Fallback fields in case AI returns macros at the root level.
+     */
+    @JsonProperty("protein")
+    @com.fasterxml.jackson.annotation.JsonAlias({"protein_g", "proteins", "proteinGrams"})
+    private Double rootProtein;
+
+    @JsonProperty("carbs")
+    @com.fasterxml.jackson.annotation.JsonAlias({"carbohydrates", "carb", "carbs_g", "carbohydrate"})
+    private Double rootCarbs;
+
+    @JsonProperty("fat")
+    @com.fasterxml.jackson.annotation.JsonAlias({"fats", "fat_g", "total_fat", "lipids"})
+    private Double rootFat;
+
+    @JsonProperty("sodium")
+    @com.fasterxml.jackson.annotation.JsonAlias({"sodium_mg", "salt", "natri"})
+    private Double rootSodium;
+
+    /**
      * Primary detected ingredients.
      */
     @JsonProperty("ingredients")
@@ -79,4 +98,25 @@ public class FoodScanResponse {
     @JsonProperty("healthScore")
     @Builder.Default
     private Integer healthScore = 70;
+
+    /**
+     * Merges root-level nutrients into the nested macros object if present.
+     */
+    public void consolidateMacros() {
+        if (this.macros == null) {
+            this.macros = new NutritionMacrosDto();
+        }
+        if ((this.macros.getProtein() == null || this.macros.getProtein() == 0.0) && this.rootProtein != null) {
+            this.macros.setProtein(this.rootProtein);
+        }
+        if ((this.macros.getCarbs() == null || this.macros.getCarbs() == 0.0) && this.rootCarbs != null) {
+            this.macros.setCarbs(this.rootCarbs);
+        }
+        if ((this.macros.getFat() == null || this.macros.getFat() == 0.0) && this.rootFat != null) {
+            this.macros.setFat(this.rootFat);
+        }
+        if ((this.macros.getSodium() == null || this.macros.getSodium() == 0.0) && this.rootSodium != null) {
+            this.macros.setSodium(this.rootSodium);
+        }
+    }
 }

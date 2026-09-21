@@ -36,17 +36,37 @@ public class FoodScanServiceImpl implements FoodScanService {
             Bạn là chuyên gia dinh dưỡng và thị giác máy tính thực phẩm hàng đầu thế giới của hệ thống LifeSync AI, am hiểu sâu sắc các món ăn Việt Nam, Châu Á và quốc tế.
             
             Nhiệm vụ của bạn:
-            1. Quan sát hình ảnh và nhận diện chính xác món ăn (đặc biệt nhận diện tốt các món ăn truyền thống Việt Nam như Phở, Bún, Cơm tấm, Bánh mì, v.v.).
+            1. Quan sát hình ảnh và nhận diện chính xác món ăn (đặc biệt nhận diện tốt các món ăn truyền thống Việt Nam như Phở, Bún, Cơm tấm, Bánh mì, Thịt nướng, v.v.).
             2. Ước lượng kích thước khẩu phần thực tế dựa trên đĩa/tô và các vật thể xung quanh.
-            3. Ước tính năng lượng (calories - kcal) và các chất đa lượng (macros: protein, carbs, fat bằng gram).
-            4. Ước tính hàm lượng Natri (sodium bằng mg) - tiêu chí cực kỳ quan trọng cho chế độ ăn DASH bảo vệ tim mạch.
+            3. Ước tính năng lượng (calories tính bằng kcal) và các chất đa lượng (protein, carbs, fat tính bằng gram).
+            4. Ước tính hàm lượng Natri (sodium tính bằng mg) - tiêu chí cực kỳ quan trọng cho chế độ ăn DASH bảo vệ tim mạch.
             5. Liệt kê các thành phần chính nhận diện được trong đĩa thức ăn.
             6. Đưa ra một lời khuyên thiết thực cho sức khỏe tim mạch (heartHealthTip) dựa trên món ăn (ví dụ: cảnh báo lượng muối, dầu mỡ, khuyến khích thêm rau xanh).
             7. Đánh giá thang điểm sức khỏe tim mạch (healthScore từ 1 đến 100).
             
+            QUY ĐỊNH BẮT BUỘC VỀ ĐỊNH DẠNG JSON TRẢ VỀ:
+            Phải trả về ĐÚNG CẤU TRÚC JSON sau (tất cả các chỉ số dinh dưỡng BẮT BUỘC là số thực/number thuần túy, TUYỆT ĐỐI KHÔNG thêm ký tự đơn vị như 'g', 'kcal', 'mg'):
+            {
+              "isFood": true,
+              "foodName": "Tên món ăn (tiếng Việt)",
+              "portion": "1 đĩa vừa (~400g)",
+              "calories": 550.0,
+              "confidence": 0.95,
+              "macros": {
+                "protein": 35.0,
+                "carbs": 50.0,
+                "fat": 20.0,
+                "sodium": 750.0
+              },
+              "ingredients": ["Thịt gà", "Cơm trắng", "Dưa leo"],
+              "heartHealthTip": "Lời khuyên sức khỏe tim mạch...",
+              "healthScore": 75
+            }
+            
             LƯU Ý ĐẶC BIỆT:
             - Nếu hình ảnh chụp không phải là món ăn, thực phẩm hoặc đồ uống, hãy đặt "isFood": false.
-            - Phải trả về dữ liệu tuân thủ định dạng JSON theo đúng schema được yêu cầu.
+            - Các trường protein, carbs, fat, sodium BẮT BUỘC nằm bên trong object "macros".
+            - Hãy ước lượng hợp lý và không để các chỉ số dinh dưỡng bằng 0 nếu món ăn thực sự chứa các chất đó.
             """;
 
     private static final String USER_PROMPT = "Hãy phân tích chi tiết món ăn trong bức ảnh này và ước tính chỉ số dinh dưỡng theo tiêu chuẩn tim mạch.";
@@ -95,16 +115,19 @@ public class FoodScanServiceImpl implements FoodScanService {
             throw new BadRequestException("Hình ảnh được tải lên không nhận diện được món ăn hoặc quá mờ. Vui lòng chụp rõ nét hơn đĩa thức ăn của bạn.");
         }
 
-        // Ensure default fallbacks for nested fields
+        // Ensure default fallbacks for nested fields and merge root-level nutrients if present
         if (response.getMacros() == null) {
             response.setMacros(new NutritionMacrosDto());
         }
+        response.consolidateMacros();
         if (response.getCalories() == null) {
             response.setCalories(0.0);
         }
 
-        log.info("Successfully identified meal: '{}', Calories: {} kcal, Score: {}",
-                response.getFoodName(), response.getCalories(), response.getHealthScore());
+        log.info("Successfully identified meal: '{}', Calories: {} kcal, Protein: {}g, Carbs: {}g, Fat: {}g, Sodium: {}mg, Score: {}",
+                response.getFoodName(), response.getCalories(),
+                response.getMacros().getProtein(), response.getMacros().getCarbs(), response.getMacros().getFat(), response.getMacros().getSodium(),
+                response.getHealthScore());
 
         return response;
     }

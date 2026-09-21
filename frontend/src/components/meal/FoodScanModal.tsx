@@ -12,6 +12,7 @@ import {
 import toast from 'react-hot-toast';
 import { compressImage, formatFileSize } from '../../utils/imageCompressor';
 import { aiApi } from '../../api/aiApi';
+import { cameraService } from '../../services/cameraService';
 import type { FoodScanResponse } from '../../types/ai';
 
 interface FoodScanModalProps {
@@ -128,6 +129,30 @@ export const FoodScanModal: React.FC<FoodScanModalProps> = ({
     }
     // Reset input value to allow selecting same file again
     e.target.value = '';
+  };
+
+  const handleCaptureCamera = async () => {
+    try {
+      const file = await cameraService.takePhoto();
+      if (file) {
+        handleProcessImage(file);
+      }
+    } catch {
+      // Fallback cho trình duyệt Web thông thường
+      cameraInputRef.current?.click();
+    }
+  };
+
+  const handlePickGallery = async () => {
+    try {
+      const file = await cameraService.pickPhoto();
+      if (file) {
+        handleProcessImage(file);
+      }
+    } catch {
+      // Fallback cho trình duyệt Web thông thường
+      fileInputRef.current?.click();
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -293,7 +318,7 @@ export const FoodScanModal: React.FC<FoodScanModalProps> = ({
                     {/* Camera Button */}
                     <button
                       type="button"
-                      onClick={() => cameraInputRef.current?.click()}
+                      onClick={handleCaptureCamera}
                       className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-200 transition-all hover:scale-105 cursor-pointer"
                     >
                       <Camera className="w-4 h-4" />
@@ -303,7 +328,7 @@ export const FoodScanModal: React.FC<FoodScanModalProps> = ({
                     {/* File Upload Button */}
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={handlePickGallery}
                       className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-all hover:scale-105 cursor-pointer"
                     >
                       <UploadCloud className="w-4 h-4 text-indigo-600" />
@@ -348,7 +373,7 @@ export const FoodScanModal: React.FC<FoodScanModalProps> = ({
                   <div className="absolute bottom-3 right-3 flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={handlePickGallery}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-white text-xs font-semibold backdrop-blur-xs border border-white/20 shadow-sm cursor-pointer transition-all hover:scale-105"
                       title="Chọn ảnh khác"
                     >
