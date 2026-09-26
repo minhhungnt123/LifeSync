@@ -188,7 +188,7 @@
 #### Phần 2: Đóng gói Ứng dụng Di động Android (Capacitor)
 - [x] `TASK-803`: Cài đặt & Khởi tạo Capacitor CLI (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`), tạo thư mục dự án Android Studio.
 - [x] `TASK-804`: Tích hợp Camera & File Plugin native (`@capacitor/camera`) phục vụ tính năng AI Food Scanner trên thiết bị di động.
-- [ ] `TASK-805`: Tích hợp Local Notifications plugin (`@capacitor/local-notifications`) hỗ trợ thông báo nhắc nhở lịch trình và bữa ăn trực tiếp trên thiết bị.
+- [x] `TASK-805`: Tích hợp Local Notifications plugin (`@capacitor/local-notifications`) hỗ trợ thông báo nhắc nhở lịch trình và bữa ăn trực tiếp trên thiết bị.
 - [ ] `TASK-806`: Build, ký số (Keystore) và xuất bản tệp cài đặt Android APK (`debug` và `release-ready`).
 
 #### Phần 3: Đóng gói Ứng dụng Desktop (Tauri v2)
