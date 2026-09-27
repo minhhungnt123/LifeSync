@@ -192,7 +192,7 @@
 - [x] `TASK-806`: Build, ký số (Keystore) và xuất bản tệp cài đặt Android APK (`debug` và `release-ready`).
 
 #### Phần 3: Đóng gói Ứng dụng Desktop (Tauri v2)
-- [ ] `TASK-807`: Khởi tạo cấu hình Tauri v2 cho Vite/React (`@tauri-apps/cli`), thiết lập kích thước cửa sổ, System Tray, và Application Icon.
+- [x] `TASK-807`: Khởi tạo cấu hình Tauri v2 cho Vite/React (`@tauri-apps/cli`), thiết lập kích thước cửa sổ, System Tray, và Application Icon.
 - [ ] `TASK-808`: Đóng gói ứng dụng Desktop (Windows `.msi` / `.exe` installer) và kiểm thử hiệu năng/mức tiêu thụ RAM.
 
 ---
