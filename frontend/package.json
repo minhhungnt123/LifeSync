@@ -16,7 +16,9 @@
     "cap:build:release": "npm run cap:sync && cd android && .\\gradlew.bat assembleRelease",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build"
+    "tauri:build": "tauri build",
+    "tauri:build:nsis": "tauri build --target nsis",
+    "tauri:build:msi": "tauri build --target msi"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

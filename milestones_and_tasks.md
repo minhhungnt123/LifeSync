@@ -193,7 +193,7 @@
 
 #### Phần 3: Đóng gói Ứng dụng Desktop (Tauri v2)
 - [x] `TASK-807`: Khởi tạo cấu hình Tauri v2 cho Vite/React (`@tauri-apps/cli`), thiết lập kích thước cửa sổ, System Tray, và Application Icon.
-- [ ] `TASK-808`: Đóng gói ứng dụng Desktop (Windows `.msi` / `.exe` installer) và kiểm thử hiệu năng/mức tiêu thụ RAM.
+- [x] `TASK-808`: Đóng gói ứng dụng Desktop (Windows `.msi` / `.exe` installer) và kiểm thử hiệu năng/mức tiêu thụ RAM.
 
 ---
 

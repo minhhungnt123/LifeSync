@@ -36,6 +36,22 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "copyright": "Copyright © 2026 LifeSync Team. All rights reserved.",
+    "shortDescription": "LifeSync AI - Productivity & Wellness Companion",
+    "longDescription": "LifeSync AI is a smart personal productivity platform with an integrated Heartcare AI assistant, managing schedules, nutrition, and wellness.",
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["English"],
+        "displayLanguageSelector": false
+      },
+      "wix": {
+        "language": "en-US"
+      }
+    }
   }
 }
