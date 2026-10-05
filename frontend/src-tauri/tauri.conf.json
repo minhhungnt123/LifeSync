@@ -53,5 +53,13 @@
         "language": "en-US"
       }
     }
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/minhhungnt123/LifeSync/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXkKUldUUWFBWldOdk9KUVpQSnN4eTFXQ3RkdmR1S1ZqSHJtQ2p5S01HMGxQWFRtVXZ1UlpGQUFBQUEK"
+    }
   }
 }

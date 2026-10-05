@@ -16,6 +16,13 @@ pub fn run() {
                 )?;
             }
 
+            // Đăng ký Plugin Tự động Cập nhật phiên bản (Auto-Updater & Process)
+            #[cfg(desktop)]
+            {
+                app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
+                app.handle().plugin(tauri_plugin_process::init())?;
+            }
+
             // Xây dựng Menu ngữ cảnh cho Khay hệ thống (System Tray)
             let quit_item = MenuItem::with_id(app, "quit", "Thoát LifeSync AI", true, None::<&str>)?;
             let toggle_item = MenuItem::with_id(app, "toggle", "Ẩn / Hiện Cửa sổ", true, None::<&str>)?;
