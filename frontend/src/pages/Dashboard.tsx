@@ -7,6 +7,7 @@ import { NutritionTrendChart } from '../components/dashboard/NutritionTrendChart
 import { ScheduleTrendChart } from '../components/dashboard/ScheduleTrendChart';
 import { ErrorState } from '../components/common/ErrorState';
 import { parseApiError } from '../utils/errorUtils';
+import { NUTRITION_TOKENS } from '../constants/themeTokens';
 import {
   Sparkles,
   Calendar,
@@ -156,7 +157,7 @@ export const Dashboard: React.FC = () => {
         <div className="surface-card rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Calories nạp vào</span>
-            <div className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+            <div className={`p-2 rounded-xl border ${NUTRITION_TOKENS.CALORIES.bgClass} ${NUTRITION_TOKENS.CALORIES.textClass} ${NUTRITION_TOKENS.CALORIES.borderClass}`}>
               <UtensilsCrossed className="h-4 w-4" />
             </div>
           </div>
@@ -169,14 +170,17 @@ export const Dashboard: React.FC = () => {
                   {summary?.todayCalories.toLocaleString() || 0}
                   <span className="text-xs font-normal text-slate-400 ml-1">/ {summary?.targetCalories.toLocaleString() || 2000} kcal</span>
                 </span>
-                <span className="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${NUTRITION_TOKENS.CALORIES.textClass} ${NUTRITION_TOKENS.CALORIES.bgClass} ${NUTRITION_TOKENS.CALORIES.borderClass}`}>
                   {caloriePercent}%
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
                 <div
-                  className="bg-purple-600 h-1.5 rounded-full transition-all duration-500"
-                  style={{ width: `${caloriePercent}%` }}
+                  className="h-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${caloriePercent}%`,
+                    backgroundColor: NUTRITION_TOKENS.CALORIES.barColor,
+                  }}
                 />
               </div>
             </>

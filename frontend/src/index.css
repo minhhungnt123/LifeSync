@@ -18,6 +18,18 @@
    Border       : #E2E8F0
    ════════════════════════════════════════════════════════════════ */
 
+:root {
+  /* Semantic Macro Colors */
+  --color-macro-calories: #F97316;
+  --color-macro-calories-bg: #FFF7ED;
+  --color-macro-protein: #8B5CF6;
+  --color-macro-protein-bg: #F5F3FF;
+  --color-macro-carbs: #10B981;
+  --color-macro-carbs-bg: #ECFDF5;
+  --color-macro-fat: #EF4444;
+  --color-macro-fat-bg: #FEF2F2;
+}
+
 @layer base {
   body {
     color: #1e293b;
