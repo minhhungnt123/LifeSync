@@ -192,8 +192,30 @@
 - [x] `TASK-806`: Build, ký số (Keystore) và xuất bản tệp cài đặt Android APK (`debug` và `release-ready`).
 
 #### Phần 3: Đóng gói Ứng dụng Desktop (Tauri v2)
-- [ ] `TASK-807`: Khởi tạo cấu hình Tauri v2 cho Vite/React (`@tauri-apps/cli`), thiết lập kích thước cửa sổ, System Tray, và Application Icon.
-- [ ] `TASK-808`: Đóng gói ứng dụng Desktop (Windows `.msi` / `.exe` installer) và kiểm thử hiệu năng/mức tiêu thụ RAM.
+- [x] `TASK-807`: Khởi tạo cấu hình Tauri v2 cho Vite/React (`@tauri-apps/cli`), thiết lập kích thước cửa sổ, System Tray, và Application Icon.
+- [x] `TASK-808`: Đóng gói ứng dụng Desktop (Windows `.msi` / `.exe` installer) và kiểm thử hiệu năng/mức tiêu thụ RAM.
+
+#### Phần 4: Cơ chế Tự động Cập nhật & Quản lý Phiên bản (In-App Auto-Updater & Versioning Strategy)
+- [x] `TASK-809`: Tích hợp Tauri Auto-Updater (`@tauri-apps/plugin-updater`, `tauri-plugin-updater`) và cấp quyền `updater:default`, `process:default` trong Capabilities.
+- [x] `TASK-810`: Xây dựng `DesktopUpdateService` và giao diện thông báo `DesktopUpdateNotification` (tự động phát hiện phiên bản mới, hiển thị tiến độ tải ngầm và khởi động lại ứng dụng).
+- [x] `TASK-811`: Cấu hình endpoint cập nhật (`latest.json`) và chữ ký xác thực bảo mật (Minisign Pubkey) trong `tauri.conf.json`.
+- [x] `TASK-812`: Tích hợp quy trình CI/CD GitHub Actions tự động đóng gói bộ cài đặt và xuất bản tệp cập nhật khi phát hành phiên bản mới (Release Pipeline).
+
+> 📌 **Lưu ý Quan trọng về Vấn đề Cập nhật Phiên bản (Desktop & Mobile Update FAQ)**:
+> 
+> 1. **Khi có phiên bản mới, có cần đóng gói lại không?**
+>    - **CÓ**: Mã nguồn giao diện Web (React) và logic hệ thống (Rust) được nhúng (bundle) trực tiếp vào trong tệp nhị phân `.exe` / `.msi`. Vì vậy, khi có bất kỳ thay đổi nào trong code, bạn **bắt buộc phải build/đóng gói lại** để tạo ra tệp `.exe` và tệp cập nhật mang mã phiên bản mới (ví dụ từ `1.0.0` lên `1.0.1`).
+> 
+> 2. **Người dùng có phải tải lại và cài đặt `.exe` thủ công không?**
+>    - **KHÔNG**: Nhờ cơ chế **Tauri In-App Auto-Updater** đã tích hợp:
+>      - Ứng dụng Desktop trên máy người dùng sẽ tự động kết nối ngầm tới endpoint `latest.json` trên máy chủ / GitHub Releases khi khởi động.
+>      - Khi phát hiện phiên bản trên máy chủ cao hơn phiên bản hiện tại, ứng dụng sẽ hiển thị banner thông báo ghi chú thay đổi (Changelog) và cho phép bấm **"Cập nhật ngay"**.
+>      - Gói cập nhật được tải ngầm, xác minh tính toàn vẹn qua khóa công khai (Minisign Public Key), tự động thay thế tệp thực thi cũ và khởi động lại app mà không cần người dùng tự gỡ hay tải file installer thủ công.
+> 
+> 3. **Quy trình phát hành phiên bản mới (Release Lifecycle Checklist)**:
+>    - **Bước 1**: Nâng số phiên bản trong `frontend/package.json` và `frontend/src-tauri/tauri.conf.json` (ví dụ `1.0.0` ➔ `1.0.1`).
+>    - **Bước 2**: Commit code và gắn nhãn phiên bản trên Git: `git tag v1.0.1 && git push origin v1.0.1`.
+>    - **Bước 3**: Máy chủ CI/CD (GitHub Actions) tự động chạy tiến trình đóng gói installer (`.exe` / `.msi`), tạo tệp siêu dữ liệu `latest.json` kèm chữ ký và phát hành trực tiếp lên GitHub Releases.
 
 ---
 

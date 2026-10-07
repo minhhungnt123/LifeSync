@@ -10,6 +10,9 @@ target/
 *.war
 *.apk
 *.aab
+*.exe
+vs_BuildTools.exe
+install-cpp-tools.bat
 
 # IDEs & Editors
 .vscode/

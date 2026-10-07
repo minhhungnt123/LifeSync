@@ -29,4 +29,42 @@ If you are developing a production application, we recommend enabling type-aware
 }
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+---
+
+## 📱 Multi-Platform Distribution (Android & Desktop)
+
+LifeSync AI supports cross-platform execution across Web, Mobile Android, and Desktop:
+
+### 1. Web Application
+```bash
+npm run dev      # Khởi chạy Vite dev server (http://localhost:5173)
+npm run build    # Biên dịch mã nguồn sản xuất ra dist/
+```
+
+### 2. Android Mobile Application (Capacitor)
+```bash
+npm run cap:sync           # Đồng bộ Web dist sang Android assets
+npm run cap:build:debug    # Build APK Debug (assembleDebug)
+npm run cap:build:release  # Build APK Release-ready (assembleRelease)
+```
+
+### 3. Windows Desktop Application (Tauri v2)
+- **Engine**: Tauri v2 + Microsoft Edge WebView2 Evergreen
+- **System Tray**: Hỗ trợ chạy ngầm, thu nhỏ khi bấm Close, click icon để khôi phục.
+- **Hiệu năng & Tiêu thụ RAM**: Chỉ ~38MB RAM ở trạng thái nghỉ, xem chi tiết tại [desktop_performance_benchmark.md](file:///d:/PersonalProject/docs/desktop_performance_benchmark.md).
+
+```bash
+# Chạy trong môi trường phát triển Desktop
+npm run tauri:dev
+
+# Đóng gói bộ cài đặt Windows:
+npm run tauri:build        # Đóng gói cả NSIS (.exe) và WiX (.msi)
+npm run tauri:build:nsis   # Đóng gói riêng NSIS (.exe) installer
+npm run tauri:build:msi    # Đóng gói riêng WiX (.msi) installer
+
+# Hoặc sử dụng script kiểm tra môi trường:
+powershell -ExecutionPolicy Bypass -File scripts/build-desktop.ps1
+```
+
+*Lưu ý*: Dự án đã tích hợp CI/CD tự động tại `.github/workflows/desktop-build.yml` giúp tự động xuất xưởng file cài đặt Windows khi push code lên GitHub.
+

@@ -7,6 +7,7 @@ import { Layout } from './components/Layout';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LoadingFallback } from './components/common/LoadingFallback';
 import { AppRouter } from './components/common/AppRouter';
+import { DesktopUpdateNotification } from './components/common/DesktopUpdateNotification';
 import { Toaster } from 'react-hot-toast';
 
 // Dynamic Code Splitting for Performance Optimization
@@ -57,6 +58,7 @@ export default function App() {
                 {/* Catch-all Fallback Route for Deep Links & 404 */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
+              <DesktopUpdateNotification />
             </Suspense>
           </AppRouter>
         </AuthProvider>

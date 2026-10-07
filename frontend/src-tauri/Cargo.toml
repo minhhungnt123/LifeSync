@@ -1,0 +1,34 @@
+[package]
+name = "lifesync-desktop"
+version = "1.0.0"
+description = "LifeSync AI - Productivity & Wellness Companion"
+authors = ["LifeSync Team"]
+license = "MIT"
+repository = "https://github.com/minhhungnt123/LifeSync"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "lifesync_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.0", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.12.0", features = ["tray-icon"] }
+tauri-plugin-log = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"
+
+[profile.release]
+opt-level = "z"         # Optimize for size
+lto = true              # Enable Link Time Optimization
+codegen-units = 1       # Reduce number of codegen units to increase optimizations
+panic = "abort"         # Abort on panic to remove unwind tables
+strip = true            # Automatically strip symbols from the binary
+
