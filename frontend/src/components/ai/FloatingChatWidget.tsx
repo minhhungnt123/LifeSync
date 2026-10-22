@@ -122,7 +122,7 @@ export const FloatingChatWidget: React.FC = () => {
           </div>
 
           {/* Quick Prompt Chips */}
-          <div className="px-3.5 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="scroll-fade-x px-3.5 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5">
             {QUICK_PROMPTS.map((prompt, idx) => (
               <button
                 key={idx}

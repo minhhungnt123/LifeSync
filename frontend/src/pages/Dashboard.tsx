@@ -8,6 +8,7 @@ import { ScheduleTrendChart } from '../components/dashboard/ScheduleTrendChart';
 import { ErrorState } from '../components/common/ErrorState';
 import { parseApiError } from '../utils/errorUtils';
 import { NUTRITION_TOKENS } from '../constants/themeTokens';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Calendar,
@@ -18,6 +19,7 @@ import {
   PieChart as PieChartIcon,
   Activity,
   Bot,
+  ArrowRight,
 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
@@ -198,9 +200,21 @@ export const Dashboard: React.FC = () => {
           {isLoading ? (
             <div className="h-12 bg-slate-100 animate-pulse rounded-lg" />
           ) : (
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              "{getAiInsight()}"
-            </p>
+            <>
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                "{getAiInsight()}"
+              </p>
+              <div className="mt-3 pt-2.5 border-t border-indigo-100/60 flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">Được tối ưu theo hồ sơ của bạn</span>
+                <Link
+                  to="/ai-assistant"
+                  className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors cursor-pointer group"
+                >
+                  <span>Trò chuyện với AI</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </>
           )}
         </div>
 
@@ -252,7 +266,7 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
           <div>
             <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-purple-600" />
+              <Activity className={`h-4 w-4 ${NUTRITION_TOKENS.CALORIES.textClass}`} />
               Xu hướng nạp Calories (7 ngày gần nhất)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">Theo dõi lượng Calorie tiêu thụ hàng ngày</p>

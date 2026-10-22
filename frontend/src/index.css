@@ -18,8 +18,19 @@
    Border       : #E2E8F0
    ════════════════════════════════════════════════════════════════ */
 
+@theme {
+  --color-macro-calories: #F97316;
+  --color-macro-calories-bg: #FFF7ED;
+  --color-macro-protein: #8B5CF6;
+  --color-macro-protein-bg: #F5F3FF;
+  --color-macro-carbs: #10B981;
+  --color-macro-carbs-bg: #ECFDF5;
+  --color-macro-fat: #EF4444;
+  --color-macro-fat-bg: #FEF2F2;
+}
+
 :root {
-  /* Semantic Macro Colors */
+  /* Semantic Macro Colors (Fallback & Direct CSS Var Access) */
   --color-macro-calories: #F97316;
   --color-macro-calories-bg: #FFF7ED;
   --color-macro-protein: #8B5CF6;
@@ -60,6 +71,31 @@
 .surface-alt {
   background: #EEF2FF;
   border: 1px solid #C7D2FE;
+}
+
+/* ── Smooth Horizontal Scroll with Fade Edges ──────────────────────────────── */
+.scroll-fade-x {
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  mask-image: linear-gradient(
+    to right,
+    transparent 0px,
+    black 16px,
+    black calc(100% - 16px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0px,
+    black 16px,
+    black calc(100% - 16px),
+    transparent 100%
+  );
+}
+
+.scroll-fade-x::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* ── Gradient Borders (light) ───────────────────────────────────────────────── */

@@ -204,7 +204,7 @@ export const AiChatPage: React.FC = () => {
             <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
             <span>Gợi ý câu hỏi nhanh:</span>
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="scroll-fade-x flex items-center gap-2 py-1 px-1">
             {promptChips.map((chip) => (
               <button
                 key={chip.id}

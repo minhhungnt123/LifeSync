@@ -1,6 +1,7 @@
 import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { NutritionTrend } from '../../types/dashboard';
+import { NUTRITION_TOKENS } from '../../constants/themeTokens';
 
 interface NutritionTrendChartProps {
   data: NutritionTrend[];
@@ -21,9 +22,9 @@ export const NutritionTrendChart: React.FC<NutritionTrendChartProps> = ({ data }
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
-            <linearGradient id="colorCalories" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#A855F7" stopOpacity={0.4} />
-              <stop offset="95%" stopColor="#A855F7" stopOpacity={0.0} />
+            <linearGradient id={NUTRITION_TOKENS.CALORIES.chartGradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={NUTRITION_TOKENS.CALORIES.hex} stopOpacity={0.4} />
+              <stop offset="95%" stopColor={NUTRITION_TOKENS.CALORIES.hex} stopOpacity={0.0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
@@ -36,12 +37,20 @@ export const NutritionTrendChart: React.FC<NutritionTrendChartProps> = ({ data }
                 return (
                   <div className="bg-white/95 backdrop-blur-md p-3 rounded-xl shadow-lg border border-slate-100 text-xs">
                     <p className="font-semibold text-slate-800 mb-1">Ngày {label}</p>
-                    <div className="space-y-1 text-slate-600">
-                      <p className="font-bold text-purple-600">🔥 Calories: {item.totalCalories} kcal</p>
-                      <div className="grid grid-cols-3 gap-2 text-[11px] pt-1 border-t border-slate-100">
-                        <span>P: {item.totalProtein}g</span>
-                        <span>C: {item.totalCarbs}g</span>
-                        <span>F: {item.totalFat}g</span>
+                    <div className="space-y-1">
+                      <p className={`font-bold ${NUTRITION_TOKENS.CALORIES.textClass}`}>
+                        🔥 Calories: {item.totalCalories.toLocaleString()} kcal
+                      </p>
+                      <div className="grid grid-cols-3 gap-2 text-[11px] pt-1.5 border-t border-slate-100 font-medium">
+                        <span className={NUTRITION_TOKENS.PROTEIN.textClass}>
+                          P: <strong className="font-bold">{item.totalProtein}g</strong>
+                        </span>
+                        <span className={NUTRITION_TOKENS.CARBS.textClass}>
+                          C: <strong className="font-bold">{item.totalCarbs}g</strong>
+                        </span>
+                        <span className={NUTRITION_TOKENS.FAT.textClass}>
+                          F: <strong className="font-bold">{item.totalFat}g</strong>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -53,10 +62,10 @@ export const NutritionTrendChart: React.FC<NutritionTrendChartProps> = ({ data }
           <Area
             type="monotone"
             dataKey="totalCalories"
-            stroke="#A855F7"
+            stroke={NUTRITION_TOKENS.CALORIES.hex}
             strokeWidth={2.5}
             fillOpacity={1}
-            fill="url(#colorCalories)"
+            fill={`url(#${NUTRITION_TOKENS.CALORIES.chartGradientId})`}
           />
         </AreaChart>
       </ResponsiveContainer>
