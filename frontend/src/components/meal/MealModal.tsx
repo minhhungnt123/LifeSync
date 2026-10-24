@@ -3,6 +3,7 @@ import { X, Utensils, Flame, Sparkles, AlertTriangle, Dumbbell, Wheat, Droplet }
 import type { MealLog, MealLogRequest, MealType } from '../../types/meal';
 import { parseApiError } from '../../utils/errorUtils';
 import { NUTRITION_TOKENS } from '../../constants/themeTokens';
+import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer';
 
 interface MealModalProps {
   isOpen: boolean;
@@ -176,7 +177,7 @@ export const MealModal: React.FC<MealModalProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
             <span className="text-xs font-semibold text-indigo-700">Gợi ý món ăn nhanh:</span>
           </div>
-          <div className="scroll-fade-x flex items-center gap-2 py-1 px-1">
+          <HorizontalScrollContainer showArrows innerClassName="gap-2 py-1 px-1">
             {PRESET_FOODS.map((preset) => (
               <button
                 key={preset.name}
@@ -187,7 +188,7 @@ export const MealModal: React.FC<MealModalProps> = ({
                 {preset.name} ({preset.calories} kcal)
               </button>
             ))}
-          </div>
+          </HorizontalScrollContainer>
         </div>
 
         {/* Form */}

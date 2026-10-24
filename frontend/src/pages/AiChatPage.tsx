@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Bot,
@@ -16,6 +17,7 @@ import {
 import { useAiChat } from '../hooks/useAiChat';
 import { ChatMessageItem } from '../components/ai/ChatMessageItem';
 import { TypingThinkingIndicator } from '../components/ai/TypingThinkingIndicator';
+import { HorizontalScrollContainer } from '../components/common/HorizontalScrollContainer';
 import { aiApi } from '../api/aiApi';
 
 const DEFAULT_CHIPS = [
@@ -26,10 +28,26 @@ const DEFAULT_CHIPS = [
 ];
 
 export const AiChatPage: React.FC = () => {
+  const location = useLocation();
   const { messages, isSending, sendMessage, clearHistory } = useAiChat();
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Lắng nghe initialPrompt được truyền từ Dashboard (khi bấm "Xem thêm & Hỏi AI")
+  useEffect(() => {
+    const state = location.state as { initialPrompt?: string } | null;
+    if (state?.initialPrompt) {
+      setInputMessage(state.initialPrompt);
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+        }
+      }, 100);
+    }
+  }, [location.state]);
 
   // Fetch suggested prompts from backend
   const { data: suggestionsResponse } = useQuery({
@@ -204,19 +222,19 @@ export const AiChatPage: React.FC = () => {
             <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
             <span>Gợi ý câu hỏi nhanh:</span>
           </div>
-          <div className="scroll-fade-x flex items-center gap-2 py-1 px-1">
+          <HorizontalScrollContainer innerClassName="gap-2 py-1.5 px-3">
             {promptChips.map((chip) => (
               <button
                 key={chip.id}
                 type="button"
                 disabled={isSending}
                 onClick={() => handleChipClick(chip.prompt)}
-                className="shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
+                className="shrink-0 whitespace-nowrap px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50/80 hover:bg-indigo-100 text-indigo-700 transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50"
               >
                 {chip.title}
               </button>
             ))}
-          </div>
+          </HorizontalScrollContainer>
         </div>
 
         {/* Input Bar */}

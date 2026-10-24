@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import type { ScheduleCategory } from '../../types/schedule';
 import { routineTemplateApi, type RoutineTemplateRequest } from '../../api/routineTemplateApi';
 import { CATEGORY_EMOJIS } from '../../constants/scheduleConstants';
+import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer';
 
 export interface QuickRoutineDockProps {
   selectedDate: Date;
@@ -81,7 +82,7 @@ export const QuickRoutineDock: React.FC<QuickRoutineDockProps> = ({
       </div>
 
       {/* Routine Pills Row */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1 min-h-[44px]">
+      <HorizontalScrollContainer showArrows innerClassName="gap-2 py-1.5 px-2 min-h-[44px]">
         {isLoading ? (
           <div className="flex items-center gap-2 text-xs text-slate-400 py-1 px-2">
             <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-500" />
@@ -123,7 +124,7 @@ export const QuickRoutineDock: React.FC<QuickRoutineDockProps> = ({
           <Plus className="w-3.5 h-3.5" />
           <span>Thêm thói quen</span>
         </button>
-      </div>
+      </HorizontalScrollContainer>
 
       {/* Add Custom Routine Modal */}
       {isAddModalOpen && (

@@ -78,6 +78,8 @@
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on mobile */
+  overscroll-behavior-x: contain;
   mask-image: linear-gradient(
     to right,
     transparent 0px,
