@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sun, Sunset, Moon, Coffee, Plus, Trash2, Edit2, Clock, Flame } from 'lucide-react';
 import type { MealLog, MealType } from '../../types/meal';
+import { NUTRITION_TOKENS } from '../../constants/themeTokens';
 
 interface MealCategorySectionProps {
   type: MealType;
@@ -121,9 +122,15 @@ export const MealCategorySection: React.FC<MealCategorySectionProps> = ({
                     <Clock className="w-3 h-3 text-slate-400" />
                     {formatTime(meal.loggedAt)}
                   </span>
-                  <span>P: <strong className="text-slate-600">{meal.protein || 0}g</strong></span>
-                  <span>C: <strong className="text-slate-600">{meal.carbs || 0}g</strong></span>
-                  <span>F: <strong className="text-slate-600">{meal.fat || 0}g</strong></span>
+                  <span className={NUTRITION_TOKENS.PROTEIN.textClass}>
+                    P: <strong className="font-semibold">{meal.protein || 0}g</strong>
+                  </span>
+                  <span className={NUTRITION_TOKENS.CARBS.textClass}>
+                    C: <strong className="font-semibold">{meal.carbs || 0}g</strong>
+                  </span>
+                  <span className={NUTRITION_TOKENS.FAT.textClass}>
+                    F: <strong className="font-semibold">{meal.fat || 0}g</strong>
+                  </span>
                 </div>
               </div>
 

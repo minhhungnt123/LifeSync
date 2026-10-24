@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import type { MealLogRequest, MealType } from '../../types/meal';
 import type { FoodScanResponse } from '../../types/ai';
+import { NUTRITION_TOKENS } from '../../constants/themeTokens';
 
 interface FoodScanReviewModalProps {
   isOpen: boolean;
@@ -446,8 +447,8 @@ export const FoodScanReviewModal: React.FC<FoodScanReviewModalProps> = ({
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {/* Calories */}
-                  <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/80 space-y-1">
-                    <div className="flex items-center justify-between text-amber-700 text-xs font-bold">
+                  <div className={`p-3.5 rounded-2xl ${NUTRITION_TOKENS.CALORIES.cardBgClass} space-y-1`}>
+                    <div className={`flex items-center justify-between ${NUTRITION_TOKENS.CALORIES.textClass} text-xs font-bold`}>
                       <span className="flex items-center gap-1">
                         <Flame className="w-3.5 h-3.5" /> Calorie
                       </span>
@@ -465,8 +466,8 @@ export const FoodScanReviewModal: React.FC<FoodScanReviewModalProps> = ({
                   </div>
 
                   {/* Protein */}
-                  <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-200/80 space-y-1">
-                    <div className="flex items-center justify-between text-blue-700 text-xs font-bold">
+                  <div className={`p-3.5 rounded-2xl ${NUTRITION_TOKENS.PROTEIN.cardBgClass} space-y-1`}>
+                    <div className={`flex items-center justify-between ${NUTRITION_TOKENS.PROTEIN.textClass} text-xs font-bold`}>
                       <span className="flex items-center gap-1">
                         <Dna className="w-3.5 h-3.5" /> Đạm (Prot)
                       </span>
@@ -485,8 +486,8 @@ export const FoodScanReviewModal: React.FC<FoodScanReviewModalProps> = ({
                   </div>
 
                   {/* Carbs */}
-                  <div className="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-200/80 space-y-1">
-                    <div className="flex items-center justify-between text-emerald-700 text-xs font-bold">
+                  <div className={`p-3.5 rounded-2xl ${NUTRITION_TOKENS.CARBS.cardBgClass} space-y-1`}>
+                    <div className={`flex items-center justify-between ${NUTRITION_TOKENS.CARBS.textClass} text-xs font-bold`}>
                       <span className="flex items-center gap-1">
                         <Wheat className="w-3.5 h-3.5" /> Đường bột
                       </span>
@@ -505,8 +506,8 @@ export const FoodScanReviewModal: React.FC<FoodScanReviewModalProps> = ({
                   </div>
 
                   {/* Fat */}
-                  <div className="p-3.5 rounded-2xl bg-purple-50/60 border border-purple-200/80 space-y-1">
-                    <div className="flex items-center justify-between text-purple-700 text-xs font-bold">
+                  <div className={`p-3.5 rounded-2xl ${NUTRITION_TOKENS.FAT.cardBgClass} space-y-1`}>
+                    <div className={`flex items-center justify-between ${NUTRITION_TOKENS.FAT.textClass} text-xs font-bold`}>
                       <span className="flex items-center gap-1">
                         <Droplet className="w-3.5 h-3.5" /> Chất béo
                       </span>

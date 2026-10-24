@@ -13,6 +13,7 @@ import {
 import { useAiChat } from '../../hooks/useAiChat';
 import { ChatMessageItem } from './ChatMessageItem';
 import { TypingThinkingIndicator } from './TypingThinkingIndicator';
+import { HorizontalScrollContainer } from '../common/HorizontalScrollContainer';
 
 const QUICK_PROMPTS = [
   'Đánh giá thực đơn hôm nay cho tim mạch?',
@@ -122,18 +123,20 @@ export const FloatingChatWidget: React.FC = () => {
           </div>
 
           {/* Quick Prompt Chips */}
-          <div className="px-3.5 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {QUICK_PROMPTS.map((prompt, idx) => (
-              <button
-                key={idx}
-                type="button"
-                disabled={isSending}
-                onClick={() => handlePromptClick(prompt)}
-                className="shrink-0 px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors cursor-pointer disabled:opacity-50"
-              >
-                {prompt}
-              </button>
-            ))}
+          <div className="bg-white border-t border-slate-100 py-1 px-2">
+            <HorizontalScrollContainer showArrows={false} innerClassName="gap-1.5 px-1 py-1">
+              {QUICK_PROMPTS.map((prompt, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  disabled={isSending}
+                  onClick={() => handlePromptClick(prompt)}
+                  className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </HorizontalScrollContainer>
           </div>
 
           {/* Input Footer */}

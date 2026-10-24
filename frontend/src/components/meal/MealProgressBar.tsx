@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flame, Dumbbell, Wheat, Droplet } from 'lucide-react';
 import type { DailyNutritionSummary } from '../../types/meal';
+import { NUTRITION_TOKENS } from '../../constants/themeTokens';
 
 interface MealProgressBarProps {
   summary?: DailyNutritionSummary;
@@ -29,56 +30,32 @@ export const MealProgressBar: React.FC<MealProgressBarProps> = ({
 
   const items = [
     {
-      label: 'Tổng Calories',
+      ...NUTRITION_TOKENS.CALORIES,
       current: currentCalories,
       target: calorieTarget,
-      unit: 'kcal',
       percent: calPercent,
       icon: Flame,
-      gradient: 'from-orange-500 to-amber-500',
-      bgColor: 'bg-orange-50',
-      borderColor: 'border-orange-100',
-      textColor: 'text-orange-600',
-      barColor: '#F97316',
     },
     {
-      label: 'Protein (Đạm)',
+      ...NUTRITION_TOKENS.PROTEIN,
       current: currentProtein,
       target: proteinTarget,
-      unit: 'g',
       percent: proPercent,
       icon: Dumbbell,
-      gradient: 'from-indigo-500 to-blue-500',
-      bgColor: 'bg-indigo-50',
-      borderColor: 'border-indigo-100',
-      textColor: 'text-indigo-600',
-      barColor: '#4F46E5',
     },
     {
-      label: 'Carbs (Tinh bột)',
+      ...NUTRITION_TOKENS.CARBS,
       current: currentCarbs,
       target: carbsTarget,
-      unit: 'g',
       percent: carbPercent,
       icon: Wheat,
-      gradient: 'from-emerald-500 to-teal-500',
-      bgColor: 'bg-emerald-50',
-      borderColor: 'border-emerald-100',
-      textColor: 'text-emerald-600',
-      barColor: '#10B981',
     },
     {
-      label: 'Fat (Chất béo)',
+      ...NUTRITION_TOKENS.FAT,
       current: currentFat,
       target: fatTarget,
-      unit: 'g',
       percent: fatPercent,
       icon: Droplet,
-      gradient: 'from-rose-500 to-pink-500',
-      bgColor: 'bg-rose-50',
-      borderColor: 'border-rose-100',
-      textColor: 'text-rose-600',
-      barColor: '#F43F5E',
     },
   ];
 
@@ -93,14 +70,14 @@ export const MealProgressBar: React.FC<MealProgressBarProps> = ({
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <div className={`p-2.5 rounded-xl ${item.bgColor} ${item.textColor}`}>
+                <div className={`p-2.5 rounded-xl border ${item.bgClass} ${item.textClass} ${item.borderClass}`}>
                   <Icon className="w-5 h-5" />
                 </div>
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   {item.label}
                 </span>
               </div>
-              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${item.bgColor} ${item.textColor}`}>
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${item.bgClass} ${item.textClass}`}>
                 {item.percent}%
               </span>
             </div>

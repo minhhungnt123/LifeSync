@@ -7,6 +7,8 @@ import { NutritionTrendChart } from '../components/dashboard/NutritionTrendChart
 import { ScheduleTrendChart } from '../components/dashboard/ScheduleTrendChart';
 import { ErrorState } from '../components/common/ErrorState';
 import { parseApiError } from '../utils/errorUtils';
+import { NUTRITION_TOKENS } from '../constants/themeTokens';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Calendar,
@@ -17,6 +19,7 @@ import {
   PieChart as PieChartIcon,
   Activity,
   Bot,
+  ArrowRight,
 } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
@@ -58,6 +61,19 @@ export const Dashboard: React.FC = () => {
     }
     return `Bạn đã hoàn thành ${summary.completedScheduleCount}/${summary.todayScheduleCount} nhiệm vụ hôm nay và tích lũy được ${summary.totalWorkHoursToday} giờ tập trung.`;
   };
+
+  // Cắt chuỗi an toàn theo ranh giới từ (word boundary) cho card AI Dashboard
+  const rawAiInsight = getAiInsight();
+  const truncateInsight = (text: string, maxLength: number = 110) => {
+    if (text.length <= maxLength) return { text, isTruncated: false };
+    const lastSpace = text.lastIndexOf(' ', maxLength);
+    const cutIndex = lastSpace > 0 ? lastSpace : maxLength;
+    return {
+      text: `${text.slice(0, cutIndex)}...`,
+      isTruncated: true,
+    };
+  };
+  const { text: displayInsight, isTruncated: isInsightTruncated } = truncateInsight(rawAiInsight);
 
   return (
     <div className="space-y-6 pb-8">
@@ -156,7 +172,7 @@ export const Dashboard: React.FC = () => {
         <div className="surface-card rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Calories nạp vào</span>
-            <div className="p-2 rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
+            <div className={`p-2 rounded-xl border ${NUTRITION_TOKENS.CALORIES.bgClass} ${NUTRITION_TOKENS.CALORIES.textClass} ${NUTRITION_TOKENS.CALORIES.borderClass}`}>
               <UtensilsCrossed className="h-4 w-4" />
             </div>
           </div>
@@ -169,14 +185,17 @@ export const Dashboard: React.FC = () => {
                   {summary?.todayCalories.toLocaleString() || 0}
                   <span className="text-xs font-normal text-slate-400 ml-1">/ {summary?.targetCalories.toLocaleString() || 2000} kcal</span>
                 </span>
-                <span className="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+                <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${NUTRITION_TOKENS.CALORIES.textClass} ${NUTRITION_TOKENS.CALORIES.bgClass} ${NUTRITION_TOKENS.CALORIES.borderClass}`}>
                   {caloriePercent}%
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-1.5 mt-3 overflow-hidden">
                 <div
-                  className="bg-purple-600 h-1.5 rounded-full transition-all duration-500"
-                  style={{ width: `${caloriePercent}%` }}
+                  className="h-1.5 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${caloriePercent}%`,
+                    backgroundColor: NUTRITION_TOKENS.CALORIES.barColor,
+                  }}
                 />
               </div>
             </>
@@ -184,19 +203,42 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Card 4: Gợi ý AI */}
-        <div className="surface-card rounded-2xl p-5 border border-indigo-100 bg-gradient-to-br from-white to-indigo-50/40 shadow-sm hover:shadow-md transition-all">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5">
-              <Bot className="h-3.5 w-3.5 text-indigo-500" />
-              Gợi ý từ AI
-            </span>
+        <div className="surface-card rounded-2xl p-5 border border-indigo-100 bg-gradient-to-br from-white to-indigo-50/40 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5">
+                <Bot className="h-3.5 w-3.5 text-indigo-500" />
+                Gợi ý từ AI
+              </span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-100/70 text-indigo-700">
+                Thông minh
+              </span>
+            </div>
+            {isLoading ? (
+              <div className="h-12 bg-slate-100 animate-pulse rounded-lg" />
+            ) : (
+              <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                "{displayInsight}"
+              </p>
+            )}
           </div>
-          {isLoading ? (
-            <div className="h-12 bg-slate-100 animate-pulse rounded-lg" />
-          ) : (
-            <p className="text-xs text-slate-600 leading-relaxed font-medium">
-              "{getAiInsight()}"
-            </p>
+
+          {!isLoading && (
+            <div className="mt-3 pt-2.5 border-t border-indigo-100/60 flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">
+                {isInsightTruncated ? 'Gợi ý phân tích' : 'Được tối ưu theo hồ sơ'}
+              </span>
+              <Link
+                to="/ai-assistant"
+                state={{
+                  initialPrompt: `Hãy phân tích chi tiết hơn về nhận định hôm nay: "${rawAiInsight}" và hướng dẫn các bước tiếp theo cho tôi.`,
+                }}
+                className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors cursor-pointer group"
+              >
+                <span>{isInsightTruncated ? 'Xem thêm & Hỏi AI' : 'Trò chuyện với AI'}</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
           )}
         </div>
 
@@ -248,7 +290,7 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
           <div>
             <h3 className="text-base font-semibold text-slate-800 flex items-center gap-2">
-              <Activity className="h-4 w-4 text-purple-600" />
+              <Activity className={`h-4 w-4 ${NUTRITION_TOKENS.CALORIES.textClass}`} />
               Xu hướng nạp Calories (7 ngày gần nhất)
             </h3>
             <p className="text-xs text-slate-400 mt-0.5">Theo dõi lượng Calorie tiêu thụ hàng ngày</p>
